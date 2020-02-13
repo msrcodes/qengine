@@ -2,9 +2,9 @@
   "name": "qengine",
   "version": "0.0.0",
   "description": "A questionnaire engine built using NodeJS for second year Web Programming coursework",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
