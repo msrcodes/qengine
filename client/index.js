@@ -11,7 +11,8 @@ function removeChildren(elem) {
 function populateList(list, data) {
     for (const i of data) {
         const child = document.createElement("li");
-        child.textContent = i;
+        child.dataset.id = i.id;
+        child.textContent = i.text;
         list.append(child);
     }
 }
