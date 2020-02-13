@@ -4,6 +4,7 @@
   "description": "A questionnaire engine built using NodeJS for second year Web Programming coursework",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/mikaelsrozee/qengine/issues"
   },
-  "homepage": "https://github.com/mikaelsrozee/qengine#readme"
+  "homepage": "https://github.com/mikaelsrozee/qengine#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
