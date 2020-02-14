@@ -89,15 +89,22 @@ app.get('/questionnaires/:id', (req, res) => {
 
 app.get('/questionnaires', (req, res) => getQuestionnaires(req, res));
 
-app.post('/questions', express.json(), (req, res) => {  // TODO: add question to specific questionnaire
+app.post('/questions', express.json(), (req, res) => {
+    const questionnaire = questionnaires[req.body.questionnaire];
+
+    if (questionnaire === undefined) {
+        res.status(404).send('No match for that ID.');
+        return;
+    }
+
     const question = {
         id: req.body.id,
         text: req.body.text,
         type: req.body.type,
         options: req.body.options,
     };
-    questionnaires[0].questions = [question, ...questionnaires[0].questions];
-    res.json(questionnaires[0].questions);
+    questionnaire.questions = [question, ...questionnaire.questions];
+    res.json(questionnaire.questions);
 });
 
 app.listen(8080);
