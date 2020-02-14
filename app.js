@@ -5,8 +5,8 @@ const app = express();
 
 app.use(express.static('client', {extensions: ['html']}));
 
-let questionnaires = [
-    {
+let questionnaires = {
+    "example-questionnaire": { // Questionnaires will be found via a UUID; this is just an example
         "name": "Example Questionnaire",
         "questions": [
             {
@@ -55,15 +55,41 @@ let questionnaires = [
             }
         ]
     },
-]; // TODO: Move this to question.js
+}; // TODO: Move this to question.js
 
-function getQuestions(req, res) {
-    res.json(questionnaires[0].questions);
+function getQuestions(questionnaireID, req, res) {
+    res.json(questionnaires[questionnaireID].questions);
 }
 
-app.get('/questions', (req, res) => getQuestions(req, res));
+function getQuestionnaires(req, res) {
+    res.json(questionnaires);
+}
 
-app.post('/questions', express.json(), (req, res) => {
+app.get('/questions/:id', (req, res) => {
+    const questionnaire = questionnaires[req.params.id];
+
+    if (questionnaire === undefined) {
+        res.status(404).send('No match for that ID.');
+        return;
+    }
+
+    res.json(getQuestions("example-questionnaire", req, res));
+});
+
+app.get('/questionnaires/:id', (req, res) => {
+    const questionnaire = questionnaires[req.params.id];
+
+    if (questionnaire === undefined) {
+        res.status(404).send('No match for that ID.');
+        return;
+    }
+
+    res.json(questionnaire);
+});
+
+app.get('/questionnaires', (req, res) => getQuestionnaires(req, res));
+
+app.post('/questions', express.json(), (req, res) => {  // TODO: add question to specific questionnaire
     const question = {
         id: req.body.id,
         text: req.body.text,
