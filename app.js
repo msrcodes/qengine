@@ -1,6 +1,8 @@
 'use strict';
 
 const express = require('express');
+const uuid = require('uuid-random');
+
 const app = express();
 
 app.use(express.static('client', {extensions: ['html']}));
@@ -98,7 +100,7 @@ app.post('/questions', express.json(), (req, res) => {
     }
 
     const question = {
-        id: req.body.id,
+        id: uuid(),
         text: req.body.text,
         type: req.body.type,
         options: req.body.options,

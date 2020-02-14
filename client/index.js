@@ -20,7 +20,6 @@ function populateList(list, data) {
 async function addQuestion(questionnaireID) {  // TODO: Which index to add question at?
     const payload = {
         questionnaire: questionnaireID,
-        id: Date(), // TODO: uuid
         text: pageElements.text.value,
         type: pageElements.type.value,
     };
