@@ -43,17 +43,19 @@ async function addQuestion() {  // TODO: Which index to add question at?
     }
 }
 
-async function displayQuestions() {
-    const response = await fetch('questions');
-    let questionsObj;
+async function displayQuestionnaire(id) {
+    const response = await fetch(`questionnaires/${id}`);
+
+    let questionnaireObj;
     if (response.ok) {
-        questionsObj = await response.json();
+        questionnaireObj = await response.json();
     } else {
-        questionsObj = ["Error; could not load questions."]; // TODO: proper error handling
+        questionnaireObj = ["Error; could not load questions."]; // TODO: proper error handling
     }
 
+    pageElements.questionnaireName.textContent = questionnaireObj.name;
     removeChildren(pageElements.questions);
-    populateList(pageElements.questions, questionsObj);
+    populateList(pageElements.questions, questionnaireObj.questions);
 }
 
 function addEventListeners() {
@@ -65,12 +67,13 @@ function getHandles() {
     pageElements.text = document.querySelector("#input-text");
     pageElements.type = document.querySelector("#input-type");
     pageElements.submit = document.querySelector("#input-submit");
+    pageElements.questionnaireName = document.querySelector("#questionnaire-name");
 }
 
 function onPageLoad() {
     getHandles();
     addEventListeners();
-    displayQuestions();
+    displayQuestionnaire("example-questionnaire");
 }
 
 window.addEventListener('load', onPageLoad);
