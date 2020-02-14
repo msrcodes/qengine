@@ -17,9 +17,9 @@ function populateList(list, data) {
     }
 }
 
-async function addQuestion() {  // TODO: Which index to add question at?
+async function addQuestion(questionnaireID) {  // TODO: Which index to add question at?
     const payload = {
-        questionnaire: "example-questionnaire",
+        questionnaire: questionnaireID,
         id: Date(), // TODO: uuid
         text: pageElements.text.value,
         type: pageElements.type.value,
@@ -56,10 +56,13 @@ async function displayQuestionnaire(id) {
     pageElements.questionnaireName.textContent = questionnaireObj.name;
     removeChildren(pageElements.questions);
     populateList(pageElements.questions, questionnaireObj.questions);
+
+    // Questionnaire ID is stored in the submit button (for now); TODO: Should this be in a parent element?
+    pageElements.submit.dataset.id = id;
 }
 
 function addEventListeners() {
-    pageElements.submit.addEventListener('click', () => addQuestion());
+    pageElements.submit.addEventListener('click', (e) => addQuestion(e.target.dataset.id));
 }
 
 function getHandles() {
