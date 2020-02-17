@@ -17,6 +17,15 @@ function populateList(list, data) {
     }
 }
 
+function populateSelect(select, data) {
+    for (const i of data) {
+        const child = document.createElement("option");
+        child.value = i;
+        child.textContent = i;
+        select.append(child);
+    }
+}
+
 async function addQuestion(questionnaireID) {  // TODO: Which index to add question at?
     const payload = {
         questionnaire: questionnaireID,
@@ -60,6 +69,20 @@ async function displayQuestionnaire(id) {
     pageElements.submit.dataset.id = id;
 }
 
+async function displayQuestionnaires() { // TODO: only display questionnaires created by the user
+    const response = await fetch('questionnaires');
+
+    let questionnairesObj;
+    if (response.ok) {
+        questionnairesObj = await response.json();
+    } else {
+        questionnairesObj = ["Error; could not load questionnaires."]; // TODO: proper error handling
+    }
+
+    removeChildren(pageElements.questionnaireInput);
+    populateSelect(pageElements.questionnaireInput, Object.keys(questionnairesObj));
+}
+
 function addEventListeners() {
     pageElements.submit.addEventListener('click', (e) => addQuestion(e.target.dataset.id));
 }
@@ -70,12 +93,14 @@ function getHandles() {
     pageElements.type = document.querySelector("#input-type");
     pageElements.submit = document.querySelector("#input-submit");
     pageElements.questionnaireName = document.querySelector("#questionnaire-name");
+    pageElements.questionnaireInput = document.querySelector("#input-questionnaire");
 }
 
 function onPageLoad() {
     getHandles();
     addEventListeners();
     displayQuestionnaire("example-questionnaire");
+    displayQuestionnaires();
 }
 
 window.addEventListener('load', onPageLoad);
