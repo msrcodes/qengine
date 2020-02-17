@@ -57,6 +57,55 @@ let questionnaires = {
             }
         ]
     },
+    "second-questionnaire": { // Questionnaires will be found via a UUID; this is just an example
+        "name": "A second Questionnaire",
+        "questions": [
+            {
+                "id": "name",
+                "text": "What is not your name?",
+                "type": "text"
+            },
+            {
+                "id": "quest",
+                "text": "What is not your quest?",
+                "type": "text"
+            },
+            {
+                "id": "col",
+                "text": "What is not your favourite colour?",
+                "type": "text"
+            },
+            {
+                "id": "velo",
+                "text": "What is not the air-speed velocity of an unladen swallow?",
+                "type": "number"
+            },
+            {
+                "id": "lord",
+                "text": "Which is not the best lord?",
+                "type": "single-select",
+                "options": [
+                    "Lord of the Rings",
+                    "Lord of the Flies",
+                    "Lord of the Dance",
+                    "Lorde"
+                ]
+            },
+            {
+                "id": "langs",
+                "text": "Which computer languages have not you used?",
+                "type": "multi-select",
+                "options": [
+                    "JavaScript",
+                    "Java",
+                    "C",
+                    "Python",
+                    "Ook",
+                    "LISP"
+                ]
+            }
+        ]
+    },
 }; // TODO: Move this to question.js
 
 function getQuestions(questionnaireID, req, res) {

@@ -85,6 +85,7 @@ async function displayQuestionnaires() { // TODO: only display questionnaires cr
 
 function addEventListeners() {
     pageElements.submit.addEventListener('click', (e) => addQuestion(e.target.dataset.id));
+    pageElements.questionnaireInput.addEventListener('change', (e) => displayQuestionnaire(e.target.value));
 }
 
 function getHandles() {
