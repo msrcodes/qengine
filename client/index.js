@@ -26,6 +26,18 @@ function populateSelect(select, data) {
     }
 }
 
+async function deleteQuestionnaire(id) {
+    const response = await fetch(`questionnaires/${id}`, {
+        method: 'DELETE',
+    });
+
+    if (response.ok) {
+        await initPage();
+    } else {
+        console.log("failed to delete questionnaire", response);    // TODO: proper error handling
+    }
+}
+
 async function addQuestion(questionnaireID) {  // TODO: Which index to add question at?
     const payload = {
         questionnaire: questionnaireID,
@@ -52,6 +64,15 @@ async function addQuestion(questionnaireID) {  // TODO: Which index to add quest
 }
 
 async function displayQuestionnaire(id) {
+    // If null is passed as a parameter, assume there are no questionnaires
+    if (id === null) {
+        pageElements.questionnaireName.textContent = "No questionnaires to display.";
+        removeChildren(pageElements.questions);
+        pageElements.submit.dataset.id = undefined;
+        pageElements.btnDeleteQuestionnaire.dataset.id = undefined;
+        return; // Short
+    }
+
     const response = await fetch(`questionnaires/${id}`);
 
     let questionnaireObj;
@@ -67,9 +88,10 @@ async function displayQuestionnaire(id) {
 
     // Questionnaire ID is stored in the submit button (for now); TODO: Should this be in a parent element?
     pageElements.submit.dataset.id = id;
+    pageElements.btnDeleteQuestionnaire.dataset.id = id;
 }
 
-async function displayQuestionnaires() { // TODO: only display questionnaires created by the user
+async function populateQuestionnairesDropdown() { // TODO: only display questionnaires created by the user
     const response = await fetch('questionnaires');
 
     let questionnairesObj;
@@ -79,13 +101,18 @@ async function displayQuestionnaires() { // TODO: only display questionnaires cr
         questionnairesObj = ["Error; could not load questionnaires."]; // TODO: proper error handling
     }
 
+    const keys = Object.keys(questionnairesObj);
+
     removeChildren(pageElements.questionnaireInput);
-    populateSelect(pageElements.questionnaireInput, Object.keys(questionnairesObj));
+    populateSelect(pageElements.questionnaireInput, keys);
+
+    return keys;
 }
 
 function addEventListeners() {
     pageElements.submit.addEventListener('click', (e) => addQuestion(e.target.dataset.id));
     pageElements.questionnaireInput.addEventListener('change', (e) => displayQuestionnaire(e.target.value));
+    pageElements.btnDeleteQuestionnaire.addEventListener('click', (e) => deleteQuestionnaire(e.target.dataset.id));
 }
 
 function getHandles() {
@@ -95,13 +122,23 @@ function getHandles() {
     pageElements.submit = document.querySelector("#input-submit");
     pageElements.questionnaireName = document.querySelector("#questionnaire-name");
     pageElements.questionnaireInput = document.querySelector("#input-questionnaire");
+    pageElements.btnDeleteQuestionnaire = document.querySelector("#btn-delete-questionnaire")
+}
+
+async function initPage() {
+    populateQuestionnairesDropdown().then(keys => {
+        if (keys.length === 0) {
+            displayQuestionnaire(null);
+        } else {
+            displayQuestionnaire(keys[0]);
+        }
+    });
 }
 
 function onPageLoad() {
     getHandles();
     addEventListeners();
-    displayQuestionnaire("example-questionnaire");
-    displayQuestionnaires();
+    initPage();
 }
 
 window.addEventListener('load', onPageLoad);
