@@ -112,6 +112,21 @@ function getQuestionnaires(req, res) {
     res.json(questionnaires);
 }
 
+app.delete('/questionnaires/:id', (req, res) => {
+    // Check to see if a questionnaire exists with the given ID
+    const questionnaire = questionnaires[req.params.id];
+
+    // If an ID does not exist, 404
+    if (questionnaire === undefined) {
+        res.status(404).send('No match for that ID.');
+        return; // Short
+    }
+
+    delete questionnaires[req.params.id];
+
+    res.json(questionnaires); // return the updated list of questionnaires
+});
+
 app.get('/questionnaires/:id', (req, res) => {
     const questionnaire = questionnaires[req.params.id];
 
