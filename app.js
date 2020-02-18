@@ -108,24 +108,9 @@ let questionnaires = {
     },
 }; // TODO: Move this to question.js
 
-function getQuestions(questionnaireID, req, res) {
-    res.json(questionnaires[questionnaireID].questions);
-}
-
 function getQuestionnaires(req, res) {
     res.json(questionnaires);
 }
-
-app.get('/questions/:id', (req, res) => {
-    const questionnaire = questionnaires[req.params.id];
-
-    if (questionnaire === undefined) {
-        res.status(404).send('No match for that ID.');
-        return;
-    }
-
-    res.json(getQuestions("example-questionnaire", req, res));
-});
 
 app.get('/questionnaires/:id', (req, res) => {
     const questionnaire = questionnaires[req.params.id];
@@ -139,23 +124,5 @@ app.get('/questionnaires/:id', (req, res) => {
 });
 
 app.get('/questionnaires', (req, res) => getQuestionnaires(req, res));
-
-app.post('/questions', express.json(), (req, res) => {
-    const questionnaire = questionnaires[req.body.questionnaire];
-
-    if (questionnaire === undefined) {
-        res.status(404).send('No match for that ID.');
-        return;
-    }
-
-    const question = {
-        id: uuid(),
-        text: req.body.text,
-        type: req.body.type,
-        options: req.body.options,
-    };
-    questionnaire.questions = [question, ...questionnaire.questions];
-    res.json(questionnaire.questions);
-});
 
 app.listen(8080);
