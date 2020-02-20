@@ -1,156 +1,19 @@
 'use strict';
 
 const express = require('express');
-const uuid = require('uuid-random');
+
+const qnr = require("./server/questionnaires");
 
 const app = express();
 
 app.use(express.static('client', {extensions: ['html']}));
 
-let questionnaires = {
-    "example-questionnaire": { // Questionnaires will be found via a UUID; this is just an example
-        "name": "Example Questionnaire",
-        "questions": [
-            {
-                "id": "name",
-                "text": "What is your name?",
-                "type": "text"
-            },
-            {
-                "id": "quest",
-                "text": "What is your quest?",
-                "type": "text"
-            },
-            {
-                "id": "col",
-                "text": "What is your favourite colour?",
-                "type": "text"
-            },
-            {
-                "id": "velo",
-                "text": "What is the air-speed velocity of an unladen swallow?",
-                "type": "number"
-            },
-            {
-                "id": "lord",
-                "text": "Which is the best lord?",
-                "type": "single-select",
-                "options": [
-                    "Lord of the Rings",
-                    "Lord of the Flies",
-                    "Lord of the Dance",
-                    "Lorde"
-                ]
-            },
-            {
-                "id": "langs",
-                "text": "Which computer languages have you used?",
-                "type": "multi-select",
-                "options": [
-                    "JavaScript",
-                    "Java",
-                    "C",
-                    "Python",
-                    "Ook",
-                    "LISP"
-                ]
-            }
-        ]
-    },
-    "second-questionnaire": { // Questionnaires will be found via a UUID; this is just an example
-        "name": "A second Questionnaire",
-        "questions": [
-            {
-                "id": "name",
-                "text": "What is not your name?",
-                "type": "text"
-            },
-            {
-                "id": "quest",
-                "text": "What is not your quest?",
-                "type": "text"
-            },
-            {
-                "id": "col",
-                "text": "What is not your favourite colour?",
-                "type": "text"
-            },
-            {
-                "id": "velo",
-                "text": "What is not the air-speed velocity of an unladen swallow?",
-                "type": "number"
-            },
-            {
-                "id": "lord",
-                "text": "Which is not the best lord?",
-                "type": "single-select",
-                "options": [
-                    "Lord of the Rings",
-                    "Lord of the Flies",
-                    "Lord of the Dance",
-                    "Lorde"
-                ]
-            },
-            {
-                "id": "langs",
-                "text": "Which computer languages have not you used?",
-                "type": "multi-select",
-                "options": [
-                    "JavaScript",
-                    "Java",
-                    "C",
-                    "Python",
-                    "Ook",
-                    "LISP"
-                ]
-            }
-        ]
-    },
-}; // TODO: Move this to question.js
-
 function getQuestionnaires(req, res) {
-    res.json(questionnaires);
+    res.json(qnr.getQuestionnaires());
 }
 
-app.post('/questions/:id', express.json(), (req, res) => {
-    // Check to see if a questionnaire exists with the given ID
-    const questionnaire = questionnaires[req.params.id];
-
-    // If an ID does not exist, 404
-    if (questionnaire === undefined) {
-        res.status(404).send('No match for that ID.');
-        return; // Short
-    }
-
-    const question = {
-        id: uuid(),
-        text: req.body.text,
-        type: req.body.type,
-        // TODO: options
-    };
-
-    questionnaire.questions = [question, ...questionnaire.questions];
-
-    res.json(questionnaires[req.params.id]); // return updated questionnaire
-});
-
-app.delete('/questionnaires/:id', (req, res) => {
-    // Check to see if a questionnaire exists with the given ID
-    const questionnaire = questionnaires[req.params.id];
-
-    // If an ID does not exist, 404
-    if (questionnaire === undefined) {
-        res.status(404).send('No match for that ID.');
-        return; // Short
-    }
-
-    delete questionnaires[req.params.id];
-
-    res.json(questionnaires); // return the updated list of questionnaires
-});
-
-app.get('/questionnaires/:id', (req, res) => {
-    const questionnaire = questionnaires[req.params.id];
+function getQuestionnaire(req, res) {
+    const questionnaire = qnr.getQuestionnaire(req.params.id);
 
     if (questionnaire === undefined) {
         res.status(404).send('No match for that ID.');
@@ -158,8 +21,36 @@ app.get('/questionnaires/:id', (req, res) => {
     }
 
     res.json(questionnaire);
-});
+}
 
-app.get('/questionnaires', (req, res) => getQuestionnaires(req, res));
+function deleteQuestionnaire(req, res) {
+    const response = qnr.deleteQuestionnaire(req.params.id);
+
+    if (response === undefined) {
+        res.status(404).send('No match for that ID.');
+        return;
+    }
+
+    res.json(response); // return updated list of questionnaires
+}
+
+function addQuestion(req, res) {
+    const response = qnr.addQuestion(req.params.id, req.body.text, req.body.type, req.body.options);
+
+    if (response === undefined) {
+        res.status(404).send('No match for that ID.');
+        return;
+    }
+
+    res.json(response); // return updated questionnaire
+}
+
+app.post('/questions/:id', express.json(), addQuestion);
+
+app.delete('/questionnaires/:id', deleteQuestionnaire);
+
+app.get('/questionnaires/:id', getQuestionnaire);
+
+app.get('/questionnaires', getQuestionnaires);
 
 app.listen(8080);
