@@ -40,12 +40,11 @@ async function deleteQuestionnaire(id) {
 
 async function addQuestion(questionnaireID) {  // TODO: Which index to add question at?
     const payload = {
-        questionnaire: questionnaireID,
         text: pageElements.text.value,
         type: pageElements.type.value,
     };
 
-    const response = await fetch('questions', {
+    const response = await fetch(`questions/${questionnaireID}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload),
@@ -54,7 +53,8 @@ async function addQuestion(questionnaireID) {  // TODO: Which index to add quest
     if (response.ok) {
         pageElements.text.value = "";
         pageElements.type.value = "";
-        const updatedQuestions = await response.json();
+        const updatedQuestionnaire = await response.json();
+        const updatedQuestions = updatedQuestionnaire.questions;
 
         removeChildren(pageElements.questions);
         populateList(pageElements.questions, updatedQuestions);

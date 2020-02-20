@@ -112,6 +112,28 @@ function getQuestionnaires(req, res) {
     res.json(questionnaires);
 }
 
+app.post('/questions/:id', express.json(), (req, res) => {
+    // Check to see if a questionnaire exists with the given ID
+    const questionnaire = questionnaires[req.params.id];
+
+    // If an ID does not exist, 404
+    if (questionnaire === undefined) {
+        res.status(404).send('No match for that ID.');
+        return; // Short
+    }
+
+    const question = {
+        id: uuid(),
+        text: req.body.text,
+        type: req.body.type,
+        // TODO: options
+    };
+
+    questionnaire.questions = [question, ...questionnaire.questions];
+
+    res.json(questionnaires[req.params.id]); // return updated questionnaire
+});
+
 app.delete('/questionnaires/:id', (req, res) => {
     // Check to see if a questionnaire exists with the given ID
     const questionnaire = questionnaires[req.params.id];
