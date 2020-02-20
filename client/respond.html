@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QEngine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="respond.js"></script>
+</head>
+<body>
+    <header>
+        <h1>QEngine</h1>
+        <h2 id="questionnaire-name">Loading...</h2>
+    </header>
+    <form id="questionnaire-container">
+        <div class="question-text">
+            <label>
+                <span>Question?</span>
+                <input type="text">
+            </label>
+        </div>
+        <div class="question-number">
+            <label>
+                <span>Question?</span>
+                <input type="number">
+            </label>
+        </div>
+        <div class="question-single-select">
+            <fieldset>
+                <legend>Question?</legend>
+                <input type="radio" id="radio-test-0" name="id">
+                <label for="radio-test-0">Option A</label>
+
+                <input type="radio" id="radio-test-1" name="id">
+                <label for="radio-test-1">Option B</label>
+            </fieldset>
+        </div>
+        <div class="question-multi-select">
+            <fieldset>
+                <legend>Question?</legend>
+                <input type="checkbox" id="checkbox-test-0" name="id">
+                <label for="checkbox-test-0">Option A</label>
+
+                <input type="checkbox" id="checkbox-test-1" name="id">
+                <label for="checkbox-test-1">Option B</label>
+            </fieldset>
+        </div>
+    </form>
+</body>
+</html>
