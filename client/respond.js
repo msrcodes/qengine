@@ -31,15 +31,25 @@ function displayQuestion(data) {
     // populate templateClone with data
     templateClone.querySelector(".text").textContent = data.text;
 
+    if (templateClone.querySelector("input") !== null) {
+        templateClone.querySelector("input").id = `${data.id}`;
+        templateClone.querySelector("label").htmlFor = `${data.id}`;
+    }
+
     // if a question should have an options attribute, populate options
     const optionTemplate = document.querySelector("#option-" + data.type);
     if (optionTemplate !== null) {
         const optionContainer = templateClone.querySelector(".option-container");
 
+        let i = 0;
         for (const option of data.options) {
             const optionClone = optionTemplate.content.cloneNode(true);
 
             optionClone.querySelector(".option-text").textContent = option;
+
+            optionClone.querySelector("input").id = `${data.id}-${i}`;
+            optionClone.querySelector("label").htmlFor = `${data.id}-${i}`;
+            i++;
 
             optionContainer.append(optionClone);
         }
