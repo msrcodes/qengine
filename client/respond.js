@@ -13,6 +13,10 @@ function getTemplateFromType(type) {
     return dictionary[type];
 }
 
+function getQuestionnaireId() {
+    return window.location.hash.substring(1);
+}
+
 function displayQuestion(data) {
     const template = getTemplateFromType(data.type);
 
@@ -44,10 +48,6 @@ function displayQuestion(data) {
     }
     
     pageElements.qnrContainer.append(templateClone);
-}
-
-function getQuestionnaireId() {
-    return window.location.hash.substring(1);
 }
 
 function displayQuestionnaire(obj) {
