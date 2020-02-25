@@ -17,6 +17,36 @@ function getQuestionnaireId() {
     return window.location.hash.substring(1);
 }
 
+function getFormData() {
+    const data = {};
+    const fieldsets = document.querySelectorAll("#questionnaire-container > fieldset");
+
+    for (const fieldset of fieldsets) {
+        if (fieldset.classList.contains("option-container")) {
+            let checked = [];
+            const inputs = fieldset.querySelectorAll("input");
+            for (const input of inputs) {
+                if (input.checked) {
+                    const label = fieldset.querySelector(`label[for='${input.id}']`);
+
+                    checked = [label.textContent, ...checked];
+                }
+            }
+            data[inputs[0].name] = checked;
+        } else {
+            const input = fieldset.querySelector("input");
+
+            if (input.type === "number") {
+                data[input.id] = Number(input.value);
+            } else {
+                data[input.id] = input.value;
+            }
+        }
+    }
+
+    return data;
+}
+
 function displayQuestion(data) {
     const template = getTemplateFromType(data.type);
 
