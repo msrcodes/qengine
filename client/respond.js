@@ -48,6 +48,7 @@ function displayQuestion(data) {
             optionClone.querySelector(".option-text").textContent = option;
 
             optionClone.querySelector("input").id = `${data.id}-${i}`;
+            optionClone.querySelector("input").name = `${data.id}`;
             optionClone.querySelector("label").htmlFor = `${data.id}-${i}`;
             i++;
 
