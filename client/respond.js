@@ -38,7 +38,7 @@ function displayQuestion(data) {
 
     // if a question should have an options attribute, populate options
     const optionTemplate = document.querySelector("#option-" + data.type);
-    if (optionTemplate !== null) {
+    if (optionTemplate != null) {
         const optionContainer = templateClone.querySelector(".option-container");
 
         let i = 0;
@@ -53,8 +53,6 @@ function displayQuestion(data) {
 
             optionContainer.append(optionClone);
         }
-    } else {
-        console.warn("Found unexpected options attribute on question type", data.type, "question id", data.id);
     }
     
     pageElements.qnrContainer.append(templateClone);
