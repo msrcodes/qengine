@@ -6,7 +6,7 @@ const questionnaires = require("./test-questionnaires");
 
 /**
  * Used to retrieve all currently stored questionnaires
- * @returns Object A JSON object containing all stored questionnaires
+ * @returns Object A JS object containing all stored questionnaires
  */
 function getQuestionnaires() {
     return questionnaires;
@@ -15,7 +15,7 @@ function getQuestionnaires() {
 /**
  * Used to retrieve a specific questionnaire
  * @param id The id of the questionnaire to retrieve
- * @returns {Object | undefined} A JSON object, the questionnaire found
+ * @returns {Object | undefined} A JS object, the questionnaire found
  */
 function getQuestionnaire(id) {
     return questionnaires[id];
@@ -24,7 +24,7 @@ function getQuestionnaire(id) {
 /**
  * Used to delete a specific questionnaire
  * @param id The id of the questionnaire to delete
- * @returns {Object | undefined} A JSON object, the updated list of all stored questionnaires
+ * @returns {Object | undefined} A JS object, the updated list of all stored questionnaires
  */
 function deleteQuestionnaire(id) {
     const questionnaire = getQuestionnaire(id); // Get questionnaire from memory
@@ -43,7 +43,7 @@ function deleteQuestionnaire(id) {
  * @param questionText The text content of the question
  * @param questionType The type of the question
  * @param questionOptions The options associated with that question
- * @returns {Object | undefined} A JSON object, the updated questionnaire
+ * @returns {Object | undefined} A JS object, the updated questionnaire
  */
 function addQuestion(questionnaireId, questionText, questionType, questionOptions) {
     const questionnaire = getQuestionnaire(questionnaireId);
