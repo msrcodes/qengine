@@ -1,0 +1,12 @@
+{
+  "example-questionnaire": [
+    {
+      "name": "John",
+      "quest": "World Domination",
+      "col": "#FFFFFF",
+      "velo": 42,
+      "lord": "Lorde",
+      "langs": ["Java", "Python"]
+    }
+  ]
+}

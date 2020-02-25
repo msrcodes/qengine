@@ -1,12 +1,23 @@
 'use strict';
 
 const express = require('express');
-
 const qnr = require("./server/questionnaires");
+const resp = require("./server/responses");
 
 const app = express();
 
 app.use(express.static('client', {extensions: ['html']}));
+
+function getResponses(req, res) {
+    const responses = resp.getResponses(req.params.id);
+
+    if (responses === undefined) {
+        res.status(404).send('No match for that ID.');
+        return;
+    }
+
+    res.json(responses);
+}
 
 function getQuestionnaires(req, res) {
     res.json(qnr.getQuestionnaires());
@@ -44,6 +55,8 @@ function addQuestion(req, res) {
 
     res.json(response); // return updated questionnaire
 }
+
+app.get('/responses/:id', getResponses);
 
 app.post('/questions/:id', express.json(), addQuestion);
 
