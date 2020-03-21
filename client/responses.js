@@ -37,10 +37,6 @@ function getHandles() {
     pageElements.respContainer = document.querySelector("#responses-container");
 }
 
-function addEventListeners() {
-
-}
-
 function addResponseContainer(question) {
     const template = document.querySelector("#response");
     const clone = template.content.cloneNode(true);
@@ -51,7 +47,21 @@ function addResponseContainer(question) {
     pageElements.respContainer.appendChild(clone);
 }
 
-function addResponse(response) {
+function highlightResponses(event) {
+    const likeResponses = document.querySelectorAll(`[data-id~="${event.target.dataset.id}"]`);
+
+    if (event.type === "mouseenter") {
+        for (const response of likeResponses) {
+            response.style = "font-weight: bold;";  // TODO: use CSS classes instead
+        }
+    } else if (event.type === "mouseout") {
+        for (const response of likeResponses) {
+            response.style = "";    // TODO: use CSS classes instead
+        }
+    }
+}
+
+function addResponse(response, i) {
     for (const key of Object.keys(response)) {
         const ul = document.querySelector(`[data-id~="${key}"]`);
         const li = document.createElement("li");
@@ -60,7 +70,11 @@ function addResponse(response) {
             continue;
 
         li.appendChild(document.createTextNode(response[key]));
+        li.dataset.id = i;
         ul.appendChild(li);
+
+        li.addEventListener('mouseenter', highlightResponses);
+        li.addEventListener('mouseout', highlightResponses);
     }
 }
 
@@ -74,14 +88,15 @@ async function initPage() {
     }
 
     const responses = await getResponses();
+    let i = 0;
     for (const response of responses) {
-        addResponse(response);
+        addResponse(response, i);
+        i++;
     }
 }
 
 function onPageLoad() {
     getHandles();
-    addEventListeners();
     initPage();
 }
 
