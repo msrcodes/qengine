@@ -22,17 +22,22 @@ function getFormData() {
     const fieldsets = document.querySelectorAll("#questionnaire-container > fieldset");
 
     for (const fieldset of fieldsets) {
-        if (fieldset.classList.contains("option-container")) {
+        if (fieldset.classList.contains("option-container")) {  // if question is single-choice or multi-choice
             let checked = [];
             const inputs = fieldset.querySelectorAll("input");
-            for (const input of inputs) {
-                if (input.checked) {
+            for (const input of inputs) {   // iterate through all possible inputs
+                if (input.checked) {    // if the input is checked...
                     const label = fieldset.querySelector(`label[for='${input.id}']`);
 
-                    checked = [label.textContent, ...checked];
+                    if (input.type === 'radio') {   // ... return that input if single-choice
+                        checked = label.textContent;
+                        break;
+                    }
+
+                    checked = [label.textContent, ...checked]; // ... add it to the array if multi-choice
                 }
             }
-            data[inputs[0].name] = checked;
+            data[inputs[0].name] = checked; // add to form data object
         } else {
             const input = fieldset.querySelector("input");
 
@@ -45,6 +50,22 @@ function getFormData() {
     }
 
     return data;
+}
+
+async function postResponse(questionnaireID) {
+    const payload = getFormData();
+
+    const response = await fetch(`responses/${questionnaireID}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+        window.alert("response ok!"); // TODO: redirect to appropriate page
+    } else {
+        console.log("failed to post response", response);
+    }
 }
 
 function displayQuestion(data) {
@@ -99,12 +120,8 @@ function displayQuestionnaire(obj) {
     const submit = document.createElement("input");
     submit.type = "submit";
     submit.id = "submit";
-    submit.dataset.id = getQuestionnaireId();
+    submit.addEventListener('click', () => postResponse(getQuestionnaireId()));
     pageElements.qnrContainer.append(submit);
-}
-
-function addEventListeners() {
-    // TODO: submit responses, validation of submit
 }
 
 function getHandles() {
@@ -116,6 +133,7 @@ function getHandles() {
     pageElements.templateMultiSelectQ = document.querySelector("#question-multi-select");
     pageElements.optionSingleSelect = document.querySelector("#option-single-select");
     pageElements.optionMultiSelect = document.querySelector("#option-multi-select");
+    pageElements.submit = document.querySelector("#submit");
 }
 
 async function loadQuestionnaire() {
@@ -133,7 +151,6 @@ async function loadQuestionnaire() {
 
 function onPageLoad() {
     getHandles();
-    addEventListeners();
     loadQuestionnaire();
 }
 

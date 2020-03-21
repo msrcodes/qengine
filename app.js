@@ -8,6 +8,20 @@ const app = express();
 
 app.use(express.static('client', {extensions: ['html']}));
 
+function addResponse(req, res) {
+    const response = resp.addResponse(req.params.id, req.body);
+
+    if (response === 404) {
+        res.status(404);
+        return;
+    } else if (response === 400) {
+        res.status(400);
+        return;
+    }
+
+    res.json(response);
+}
+
 function getResponses(req, res) {
     const responses = resp.getResponses(req.params.id);
 
@@ -55,6 +69,8 @@ function addQuestion(req, res) {
 
     res.json(response); // return updated questionnaire
 }
+
+app.post('/responses/:id', express.json(), addResponse);
 
 app.get('/responses/:id', getResponses);
 
