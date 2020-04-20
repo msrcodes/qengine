@@ -51,6 +51,16 @@ function addQuestion(questionnaireId, questionText, questionType, questionOption
     if (questionnaire === undefined)
         return undefined;
 
+    const validTypes = ["text", "number", "single-select", "multi-select"];
+    if (!validTypes.includes(questionType))
+        return "invalid type";
+
+    if (questionType === "single-select" || questionType === "multi-select") {
+        if (questionOptions == null) return "invalid options";
+
+        if (questionOptions.length === 0) return "invalid options";
+    }
+
     const question = {
         id: uuid(),
         text: questionText,

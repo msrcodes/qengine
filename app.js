@@ -67,6 +67,16 @@ function addQuestion(req, res) {
         return;
     }
 
+    if (response === "invalid type") {
+        res.status(400).send('Invalid question type.');
+        return;
+    }
+
+    if (response === "invalid options") {
+        res.status(400).send('Invalid question options.');
+        return;
+    }
+
     res.json(response); // return updated questionnaire
 }
 
