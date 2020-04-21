@@ -24,6 +24,23 @@ function validate(id, data) {
         return 404;
     }
 
+    for (const key of Object.keys(data)) {
+        let flag = false;
+        for (const question of questionnaire.questions) {
+            if (question.id === key) {
+                flag = true;
+                break;
+            }
+        }
+
+        if (flag) {
+
+        } else {
+            console.log(`Found unexpected key ${key}`);
+            return 400;
+        }
+    }
+
     for (const question of questionnaire.questions) {
         const answer = data[question.id];
 
@@ -44,7 +61,7 @@ function validate(id, data) {
             valid = !isNaN(Number(answer)); // return true if answer is not NaN
             if (!valid) console.error(answer, "is not of type: number");
         } else if (question.type === "single-select") {
-            const valid = question.options.filter(option => option === answer).length > 0; // Check if value exists
+            valid = question.options.filter(option => option === answer).length > 0; // Check if value exists
 
             if (!valid) {
                 console.error(answer, "is not in", question.options);
@@ -59,6 +76,7 @@ function validate(id, data) {
         }
 
         if (!valid) {
+            console.log("bad request");
             return 400; // bad request
         }
     }

@@ -97,7 +97,7 @@ test('Add invalid response to single-select question', async () => {
         "quest": "A valid quest",
         "col": "A valid colour",
         "velo": 200,
-        "lord": "Invalid option",
+        "lord": "THIS IS A TERRIBLE INVALID RESPONSE",
         "langs": ["C", "LISP"]
     };
 
