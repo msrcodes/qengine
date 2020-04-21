@@ -149,9 +149,9 @@ async function loadQuestionnaire() {
     displayQuestionnaire(qnr);
 }
 
-function onPageLoad() {
+async function onPageLoad() {
     getHandles();
-    loadQuestionnaire();
+    await loadQuestionnaire();
 }
 
 window.addEventListener('load', onPageLoad);

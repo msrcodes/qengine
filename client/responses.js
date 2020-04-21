@@ -95,9 +95,9 @@ async function initPage() {
     }
 }
 
-function onPageLoad() {
+async function onPageLoad() {
     getHandles();
-    initPage();
+    await initPage();
 }
 
 window.addEventListener('load', onPageLoad);
