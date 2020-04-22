@@ -59,6 +59,17 @@ function deleteQuestionnaire(req, res) {
     res.json(response); // return updated list of questionnaires
 }
 
+function addQuestionnaire(req, res) {
+    const response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
+
+    if (response === 400) {
+        res.status(400).send('Bad request.');
+        return;
+    }
+
+    res.json(response);
+}
+
 function addQuestion(req, res) {
     const response = qnr.addQuestion(req.params.id, req.body.text, req.body.type, req.body.options);
 
@@ -85,6 +96,8 @@ app.post('/responses/:id', express.json(), addResponse);
 app.get('/responses/:id', getResponses);
 
 app.post('/questions/:id', express.json(), addQuestion);
+
+app.post('/questionnaires', express.json(), addQuestionnaire);
 
 app.delete('/questionnaires/:id', deleteQuestionnaire);
 

@@ -66,7 +66,7 @@ async function addQuestion(type, options) {
         const json = await res.json();
 
         const questions = json.questions;
-        const question = questions[0];
+        const question = questions[questions.length - 1];
 
         expect(question.text).toBe(text);
         expect(question.type).toBe(type);
@@ -140,6 +140,177 @@ test('Add question with bad options 2', async () => {
             text: "foo",
             type: "single-select",
             options: []
+        }),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    expect(res.status).toBe(400);
+});
+
+test('Add questionnaire via route', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires", {
+        method: "POST",
+        body: JSON.stringify({
+            name: "Test Questionnaire",
+            questions: [
+                {
+                    "id": "boop",
+                    "text": "ding dong test",
+                    "type": "text"
+                },
+                {
+                    "id": "beep",
+                    "text": "dong ding aling",
+                    "type": "number"
+                }
+            ],
+            id: "test-questionnaire"
+        }),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    if (res.ok) {
+        const id = await res.json();
+        expect(id).toStrictEqual("test-questionnaire");
+
+        const res2 = await fetch("http://localhost:8080/questionnaires/test-questionnaire", {method: "GET"});
+        if (res2.ok) {
+            const json = await res2.json();
+            expect(json).toStrictEqual({
+                name: "Test Questionnaire",
+                questions: [
+                    {
+                        "id": "boop",
+                        "text": "ding dong test",
+                        "type": "text"
+                    },
+                    {
+                        "id": "beep",
+                        "text": "dong ding aling",
+                        "type": "number"
+                    }
+                ]
+            });
+        } else {
+            expect(res.ok).toBe(true);
+        }
+    } else {
+        expect(res.ok).toBe(true);
+    }
+});
+
+test('Add questionnaire via route with no ID', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires", {
+        method: "POST",
+        body: JSON.stringify({
+            name: "Test Questionnaire",
+            questions: [
+                {
+                    "id": "boop",
+                    "text": "ding dong test",
+                    "type": "text"
+                },
+                {
+                    "id": "beep",
+                    "text": "dong ding aling",
+                    "type": "number"
+                }
+            ]
+        }),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    if (res.ok) {
+        const id = await res.json();
+
+        const res2 = await fetch(`http://localhost:8080/questionnaires/${id}`, {method: "GET"});
+        if (res2.ok) {
+            const json = await res2.json();
+            expect(json).toStrictEqual({
+                name: "Test Questionnaire",
+                questions: [
+                    {
+                        "id": "boop",
+                        "text": "ding dong test",
+                        "type": "text"
+                    },
+                    {
+                        "id": "beep",
+                        "text": "dong ding aling",
+                        "type": "number"
+                    }
+                ]
+            });
+        } else {
+            expect(res.ok).toBe(true);
+        }
+    } else {
+        expect(res.ok).toBe(true);
+    }
+});
+
+test('Add questionnaire via route with no questions', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires", {
+        method: "POST",
+        body: JSON.stringify({
+            name: "Test Questionnaire"
+        }),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    if (res.ok) {
+        const id = await res.json();
+
+        const res2 = await fetch(`http://localhost:8080/questionnaires/${id}`, {method: "GET"});
+        if (res2.ok) {
+            const json = await res2.json();
+            expect(json).toStrictEqual({
+                name: "Test Questionnaire",
+                questions: []
+            });
+        } else {
+            expect(res.ok).toBe(true);
+        }
+    } else {
+        expect(res.ok).toBe(true);
+    }
+});
+
+test('Add questionnaire via route with no name', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires", {
+        method: "POST",
+        body: JSON.stringify({
+            questions: [
+                {
+                    "id": "boop",
+                    "text": "ding dong test",
+                    "type": "text"
+                },
+                {
+                    "id": "beep",
+                    "text": "dong ding aling",
+                    "type": "number"
+                }
+            ]
+        }),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    expect(res.status).toBe(400);
+});
+
+test('Add questionnaire via route with bad question type', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires", {
+        method: "POST",
+        body: JSON.stringify({
+            name: "Test Questionnaire",
+            questions: [
+                {
+                    "id": "boop",
+                    "text": "ding dong test",
+                    "type": "thisTypeDoesNotExist"
+                }
+            ]
         }),
         headers: {'Content-Type': 'application/json'}
     });

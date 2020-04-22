@@ -21,6 +21,36 @@ function getQuestionnaire(id) {
     return questionnaires[id];
 }
 
+function addQuestionnaire(name, questions, id) {
+    // if required parameter value is not defined, return HTTP bad request error code
+    if (name === undefined)
+        return 400;
+
+    // if an id is defined, and a questionnaire already exists with that id, return HTTP bad request error code
+    if (id !== undefined && getQuestionnaire(id) !== undefined)
+        return 400;
+
+    // if optional parameter values are not defined, generate default values instead
+    const qnrId = id === undefined ? uuid() : id;
+    const qnrQs = questions === undefined ? [] : questions;
+
+    // add questionnaire to storage
+    questionnaires[qnrId] = {
+        name: name,
+        questions: []
+    };
+
+    for (const question of qnrQs) {
+        const res = addQuestion(qnrId, question.text, question.type, question.options, question.id);
+        if (res === "invalid type" || res === "invalid options") {
+            delete questionnaires[qnrId];
+            return 400;
+        }
+    }
+
+    return qnrId;
+}
+
 /**
  * Used to delete a specific questionnaire
  * @param id The id of the questionnaire to delete
@@ -43,10 +73,13 @@ function deleteQuestionnaire(id) {
  * @param questionText The text content of the question
  * @param questionType The type of the question
  * @param questionOptions The options associated with that question
+ * @param questionId Optional, defines the id of the question
  * @returns {Object | undefined} A JS object, the updated questionnaire
  */
-function addQuestion(questionnaireId, questionText, questionType, questionOptions) {
+function addQuestion(questionnaireId, questionText, questionType, questionOptions, questionId) {
     const questionnaire = getQuestionnaire(questionnaireId);
+
+    const qId = questionId === undefined ? uuid() : questionId;
 
     if (questionnaire === undefined)
         return undefined;
@@ -62,13 +95,13 @@ function addQuestion(questionnaireId, questionText, questionType, questionOption
     }
 
     const question = {
-        id: uuid(),
+        id: qId,
         text: questionText,
         type: questionType,
         options: questionOptions
     };
 
-    questionnaire.questions = [question, ...questionnaire.questions];
+    questionnaire.questions = [...questionnaire.questions, question];
 
     return questionnaire;
 }
@@ -77,5 +110,6 @@ module.exports = {
     getQuestionnaires,
     getQuestionnaire,
     deleteQuestionnaire,
+    addQuestionnaire,
     addQuestion
 };
