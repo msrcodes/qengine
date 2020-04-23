@@ -9,11 +9,49 @@ function removeChildren(elem) {
 }
 
 function populateList(list, data) {
+    let index = 0;
     for (const i of data) {
-        const child = document.createElement("li");
-        child.dataset.id = i.id;
-        child.textContent = i.text;
-        list.append(child);
+        const template = document.getElementById("template-question");
+        const clone = template.content.cloneNode(true);
+
+        clone.querySelector("#text").value = i.text;
+        clone.querySelector("#text").id = `text-${i.id}`;
+
+        clone.querySelector("#type").value = i.type;
+        clone.querySelector("#type").id = `type-${i.id}`;
+
+        if (i.type === "single-select" || i.type === "multi-select") {
+            const container = clone.querySelector("#option-container");
+            container.classList.remove("hidden");
+
+            let j = 1;
+            for (const option of i.options) {
+                const label = document.createElement("label");
+                label.htmlFor = `option-${j}`;
+                label.textContent = `[${j}]`;
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = option;
+
+                const button = document.createElement("button");
+                button.textContent = "Remove";
+                button.id = `remove-${input}`;
+
+                container.append(label, input, button);
+                j++;
+            }
+
+            const butonAddOption = document.createElement("button");
+            butonAddOption.id = "add-option";
+            butonAddOption.textContent = "Add an option";
+            container.append(butonAddOption);
+
+            container.id = `option-container-${i.id}`;
+        }
+
+        list.append(clone);
+        index++;
     }
 }
 
@@ -68,7 +106,6 @@ async function displayQuestionnaire(id) {
     if (id === null) {
         pageElements.questionnaireName.textContent = "No questionnaires to display.";
         removeChildren(pageElements.questions);
-        pageElements.submit.dataset.id = undefined;
         pageElements.btnDeleteQuestionnaire.dataset.id = undefined;
         return; // Short
     }
@@ -86,8 +123,6 @@ async function displayQuestionnaire(id) {
     removeChildren(pageElements.questions);
     populateList(pageElements.questions, questionnaireObj.questions);
 
-    // Questionnaire ID is stored in the submit button (for now); TODO: Should this be in a parent element?
-    pageElements.submit.dataset.id = id;
     pageElements.btnDeleteQuestionnaire.dataset.id = id;
 }
 
@@ -110,16 +145,12 @@ async function populateQuestionnairesDropdown() { // TODO: only display question
 }
 
 function addEventListeners() {
-    pageElements.submit.addEventListener('click', (e) => addQuestion(e.target.dataset.id));
     pageElements.questionnaireInput.addEventListener('change', (e) => displayQuestionnaire(e.target.value));
     pageElements.btnDeleteQuestionnaire.addEventListener('click', (e) => deleteQuestionnaire(e.target.dataset.id));
 }
 
 function getHandles() {
     pageElements.questions = document.querySelector("#questions");
-    pageElements.text = document.querySelector("#input-text");
-    pageElements.type = document.querySelector("#input-type");
-    pageElements.submit = document.querySelector("#input-submit");
     pageElements.questionnaireName = document.querySelector("#questionnaire-name");
     pageElements.questionnaireInput = document.querySelector("#input-questionnaire");
     pageElements.btnDeleteQuestionnaire = document.querySelector("#btn-delete-questionnaire")

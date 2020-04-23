@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QEngine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="edit.js"></script>
+<!--    todo: stylesheet -->
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>QEngine - Edit</h1>
+    <label>
+        Questionnaire:
+        <select id="input-questionnaire">
+
+        </select>
+    </label>
+    <h2 id="questionnaire-name">Loading...</h2>
+
+    <button id="btn-delete-questionnaire">Delete questionnaire</button>
+    <div id="questions">
+
+    </div>
+    <template id="template-question">
+        <div style="border: 1px solid black">
+            <label for="text">Question title:</label>
+            <input id="text" type="text">
+            <label>
+                Question type:
+                <select id="type">
+                    <option value="text">text</option>
+                    <option value="number">number</option>
+                    <option value="single-select">single-select</option>
+                    <option value="multi-select">multi-select</option>
+                </select>
+            </label>
+            <div id="option-container" class="hidden">
+
+            </div>
+            <button id="delete-question">Delete Question</button>
+        </div>
+    </template>
+</body>
+</html>
