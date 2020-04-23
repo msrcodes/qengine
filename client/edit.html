@@ -27,9 +27,8 @@
 
     </div>
     <template id="template-question">
-        <div style="border: 1px solid black">
-            <label for="text">Question title:</label>
-            <input id="text" type="text">
+        <fieldset style="border: 1px solid black">
+            <legend><label for="text" style="display: none;">Question title:</label><input id="text" type="text"></legend>
             <label>
                 Question type:
                 <select id="type">
@@ -43,7 +42,8 @@
 
             </div>
             <button id="delete-question">Delete Question</button>
-        </div>
+        </fieldset>
     </template>
+    <button id="update">Save Changes</button>
 </body>
 </html>

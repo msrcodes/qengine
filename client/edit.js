@@ -2,6 +2,35 @@
 
 const pageElements = {};
 
+function getFormData() {
+    const data = {
+        name: pageElements.questionnaireName.textContent,
+        questions: []
+    };
+
+    const questionContainers = pageElements.questions.querySelectorAll("fieldset");
+    for (const container of questionContainers) {
+        const question = {
+            id: container.dataset.id,
+            text: container.querySelector(`#text-${container.dataset.id}`).value,
+            type: container.querySelector(`#type-${container.dataset.id}`).value
+        };
+
+        if (question.type === "single-select" || question.type === "multi-select") {
+            let options = [];
+            const optionInputs = container.querySelectorAll(`#option-container-${container.dataset.id} input`);
+            for (const input of optionInputs) {
+                options = [...options, input.value];
+            }
+            question.options = options;
+        }
+
+        data.questions = [...data.questions, question];
+    }
+
+    return data;
+}
+
 function removeChildren(elem) {
     while (elem.firstElementChild) {
         elem.firstElementChild.remove();
@@ -14,15 +43,19 @@ function populateList(list, data) {
         const template = document.getElementById("template-question");
         const clone = template.content.cloneNode(true);
 
+        clone.querySelector("fieldset").dataset.id = i.id;
+
         clone.querySelector("#text").value = i.text;
         clone.querySelector("#text").id = `text-${i.id}`;
 
         clone.querySelector("#type").value = i.type;
+        clone.querySelector("#type").addEventListener('change', (e) => updateOptionContainerVisibility(e.target));
         clone.querySelector("#type").id = `type-${i.id}`;
 
+        const optionContainer = clone.querySelector("#option-container");
+
         if (i.type === "single-select" || i.type === "multi-select") {
-            const container = clone.querySelector("#option-container");
-            container.classList.remove("hidden");
+            optionContainer.classList.remove("hidden");
 
             let j = 1;
             for (const option of i.options) {
@@ -33,22 +66,23 @@ function populateList(list, data) {
                 const input = document.createElement("input");
                 input.type = "text";
                 input.value = option;
+                input.id = `option-${i.id}-${j}`;
 
                 const button = document.createElement("button");
                 button.textContent = "Remove";
-                button.id = `remove-${input}`;
+                button.id = `remove-${i.id}`;
 
-                container.append(label, input, button);
+                optionContainer.append(label, input, button);
                 j++;
             }
 
-            const butonAddOption = document.createElement("button");
-            butonAddOption.id = "add-option";
-            butonAddOption.textContent = "Add an option";
-            container.append(butonAddOption);
-
-            container.id = `option-container-${i.id}`;
+            const buttonAdd = document.createElement("button");
+            buttonAdd.id = "add-option";
+            buttonAdd.textContent = "Add an option";
+            optionContainer.append(buttonAdd);
         }
+
+        optionContainer.id = `option-container-${i.id}`;
 
         list.append(clone);
         index++;
@@ -64,6 +98,15 @@ function populateSelect(select, data) {
     }
 }
 
+function updateOptionContainerVisibility(target) {
+    const optionContainer = document.querySelector(`#option-container-${target.id.split("-")[1]}`);
+    if (target.value === "single-select" || target.value === "multi-select") {
+        optionContainer.classList.remove("hidden");
+    } else {
+        optionContainer.classList.add("hidden");
+    }
+}
+
 async function deleteQuestionnaire(id) {
     const response = await fetch(`questionnaires/${id}`, {
         method: 'DELETE',
@@ -76,28 +119,17 @@ async function deleteQuestionnaire(id) {
     }
 }
 
-async function addQuestion(questionnaireID) {  // TODO: Which index to add question at?
-    const payload = {
-        text: pageElements.text.value,
-        type: pageElements.type.value,
-    };
-
-    const response = await fetch(`questions/${questionnaireID}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload),
+async function updateQuestionnaire(id) {
+    const response = await fetch(`questionnaires/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(getFormData()),
+        headers: {'Content-Type': 'application/json'}
     });
 
     if (response.ok) {
-        pageElements.text.value = "";
-        pageElements.type.value = "";
-        const updatedQuestionnaire = await response.json();
-        const updatedQuestions = updatedQuestionnaire.questions;
-
-        removeChildren(pageElements.questions);
-        populateList(pageElements.questions, updatedQuestions);
+        alert("Successfully edited questionnaire");
     } else {
-        console.log('failed to add message', response); // TODO: proper error handling
+        console.error(`Failed to update questionnaire, error ${response.status} ${response.statusText}`);
     }
 }
 
@@ -147,13 +179,15 @@ async function populateQuestionnairesDropdown() { // TODO: only display question
 function addEventListeners() {
     pageElements.questionnaireInput.addEventListener('change', (e) => displayQuestionnaire(e.target.value));
     pageElements.btnDeleteQuestionnaire.addEventListener('click', (e) => deleteQuestionnaire(e.target.dataset.id));
+    pageElements.updateBtn.addEventListener('click', () => updateQuestionnaire(pageElements.btnDeleteQuestionnaire.dataset.id));
 }
 
 function getHandles() {
     pageElements.questions = document.querySelector("#questions");
     pageElements.questionnaireName = document.querySelector("#questionnaire-name");
     pageElements.questionnaireInput = document.querySelector("#input-questionnaire");
-    pageElements.btnDeleteQuestionnaire = document.querySelector("#btn-delete-questionnaire")
+    pageElements.btnDeleteQuestionnaire = document.querySelector("#btn-delete-questionnaire");
+    pageElements.updateBtn = document.querySelector("#update");
 }
 
 async function initPage() {
