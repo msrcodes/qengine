@@ -70,6 +70,22 @@ function addQuestionnaire(req, res) {
     res.json(response);
 }
 
+function updateQuestionnaire(req, res) {
+    const response = qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
+
+    if (response === 400) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    if (response === 404) {
+        res.status(404).send("Questionnaire not found");
+        return;
+    }
+
+    res.json(response);
+}
+
 function addQuestion(req, res) {
     const response = qnr.addQuestion(req.params.id, req.body.text, req.body.type, req.body.options);
 
@@ -96,6 +112,8 @@ app.post('/responses/:id', express.json(), addResponse);
 app.get('/responses/:id', getResponses);
 
 app.post('/questions/:id', express.json(), addQuestion);
+
+app.put('/questionnaires/:id', express.json(), updateQuestionnaire);
 
 app.post('/questionnaires', express.json(), addQuestionnaire);
 

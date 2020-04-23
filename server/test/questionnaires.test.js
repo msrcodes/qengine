@@ -317,3 +317,52 @@ test('Add questionnaire via route with bad question type', async () => {
 
     expect(res.status).toBe(400);
 });
+
+test('Update questionnaire', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires/second-questionnaire", {
+        method: "PUT",
+        body: JSON.stringify(testJson["second-questionnaire"]),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    if (res.ok) {
+        const res2 = await fetch("http://localhost:8080/questionnaires/second-questionnaire", {method: "GET"});
+        if (res2.ok) {
+            const json = await res2.json();
+            expect(json).toStrictEqual(testJson["second-questionnaire"]);
+        } else {
+            expect(res2.ok).toBe(true);
+        }
+    } else {
+        expect(res.ok).toBe(true);
+    }
+});
+
+test('Update questionnaire with invalid question type', async () => {
+    const res = await fetch("http://localhost:8080/questionnaires/second-questionnaire", {
+        method: "PUT",
+        body: JSON.stringify({
+            name: "This name is valid but won't be updated",
+            questions: [
+                {
+                    id: "validid",
+                    text: "valid text",
+                    type: "thisTypeDoesNotExist"
+                }
+            ]
+        }),
+        headers: {'Content-Type': 'application/json'}
+    });
+
+    if (!res.ok) {
+        const res2 = await fetch("http://localhost:8080/questionnaires/second-questionnaire", {method: "GET"});
+        if (res2.ok) {
+            const json = await res2.json();
+            expect(json).toStrictEqual(testJson["second-questionnaire"]);
+        } else {
+            expect(res2.ok).toBe(true);
+        }
+    } else {
+        expect(res.ok).toBe(false);
+    }
+});

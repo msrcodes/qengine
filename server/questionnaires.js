@@ -67,6 +67,46 @@ function deleteQuestionnaire(id) {
     return questionnaires;  // Return the updated list of questionnaires
 }
 
+function updateQuestionnaire(name, questions, id) {
+    // if any required parameter is missing, return HTTP Bad Request code
+    if (name === undefined || questions === undefined || id === undefined)
+        return 400;
+
+    // if no matching questionnaire is found, return HTTP Not Found code
+    if (getQuestionnaire(id) === undefined)
+        return 404;
+
+    // check all questions are valid
+    for (const question of questions) {
+        const validate = validateQuestion(question.type, question.options);
+        if (validate !== true) {
+            return 400;
+        }
+    }
+
+    // update questionnaire
+    questionnaires[id] = {
+        name: name,
+        questions: questions
+    };
+
+    return 200;
+}
+
+function validateQuestion(questionType, questionOptions) {
+    const validTypes = ["text", "number", "single-select", "multi-select"];
+    if (!validTypes.includes(questionType))
+        return "invalid type";
+
+    if (questionType === "single-select" || questionType === "multi-select") {
+        if (questionOptions == null) return "invalid options";
+
+        if (questionOptions.length === 0) return "invalid options";
+    }
+
+    return true;
+}
+
 /**
  * Used to add a question to a specific questionnaire
  * @param questionnaireId The id of the questionnaire to add a question to
@@ -84,14 +124,9 @@ function addQuestion(questionnaireId, questionText, questionType, questionOption
     if (questionnaire === undefined)
         return undefined;
 
-    const validTypes = ["text", "number", "single-select", "multi-select"];
-    if (!validTypes.includes(questionType))
-        return "invalid type";
-
-    if (questionType === "single-select" || questionType === "multi-select") {
-        if (questionOptions == null) return "invalid options";
-
-        if (questionOptions.length === 0) return "invalid options";
+    const validate = validateQuestion(questionType, questionOptions);
+    if (validate !== true) {
+        return validate;
     }
 
     const question = {
@@ -110,6 +145,7 @@ module.exports = {
     getQuestionnaires,
     getQuestionnaire,
     deleteQuestionnaire,
+    updateQuestionnaire,
     addQuestionnaire,
     addQuestion
 };
