@@ -48,6 +48,41 @@ function removeQuestion(id) {
     question.remove();
 }
 
+function addOption(container, option, id) {
+    let index;
+
+    const addContainer = container.querySelector(`#add-option-container-${id}`);
+    if (addContainer != null) {
+        addContainer.remove();
+    }
+
+    const options = container.children;
+
+    if (options.length === 0)
+        index = options.length;
+    else index = Number(options[options.length - 1].id.split("-")[1]) + 1;
+
+    const li = document.createElement("li");
+    li.id = `${id}-${index}`;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = option;
+    input.id = `option-${id}-${index}`;
+
+    const button = document.createElement("button");
+    button.textContent = "Remove";
+    button.id = `remove-${id}-${index}`;
+    button.addEventListener('click', (e) => removeOption(e.target.id.split("remove-")[1]));
+
+    li.append(input, button);
+    container.append(li);
+
+    if (addContainer != null) {
+        container.append(addContainer);
+    }
+}
+
 function populateList(list, data) {
     let index = 0;
     for (const i of data) {
@@ -73,32 +108,18 @@ function populateList(list, data) {
         if (i.type === "single-select" || i.type === "multi-select") {
             optionContainer.classList.remove("hidden");
 
-            let j = 1;
             for (const option of i.options) {
-                const li = document.createElement("li");
-                li.id = `${i.id}-${j}`;
-
-                const input = document.createElement("input");
-                input.type = "text";
-                input.value = option;
-                input.id = `option-${i.id}-${j}`;
-
-                const button = document.createElement("button");
-                button.textContent = "Remove";
-                button.id = `remove-${i.id}-${j}`;
-                button.addEventListener('click', (e) => removeOption(e.target.id.split("remove-")[1]));
-
-                li.append(input, button);
-                optionContainer.append(li);
-                j++;
+                addOption(optionContainer, option, i.id);
             }
 
             const buttonContainer = document.createElement("li");
             buttonContainer.style.listStyle = "none";
+            buttonContainer.id = `add-option-container-${i.id}`;
 
             const buttonAdd = document.createElement("button");
             buttonAdd.id = `add-option-${i.id}`;
             buttonAdd.textContent = "Add an option";
+            buttonAdd.addEventListener('click', () => addOption(optionContainer, "", i.id));
             buttonContainer.append(buttonAdd);
             optionContainer.append(buttonContainer);
         }
