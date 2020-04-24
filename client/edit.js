@@ -37,6 +37,11 @@ function removeChildren(elem) {
     }
 }
 
+function removeQuestion(id) {
+    const question = document.querySelector(`fieldset[data-id="${id}"]`);
+    question.remove();
+}
+
 function populateList(list, data) {
     let index = 0;
     for (const i of data) {
@@ -51,6 +56,9 @@ function populateList(list, data) {
         clone.querySelector("#type").value = i.type;
         clone.querySelector("#type").addEventListener('change', (e) => updateOptionContainerVisibility(e.target));
         clone.querySelector("#type").id = `type-${i.id}`;
+
+        clone.querySelector("#delete-question").addEventListener('click', () => removeQuestion(i.id));
+        clone.querySelector("#delete-question").id = `delete-question-${i.id}`;
 
         const optionContainer = clone.querySelector("#option-container");
 
@@ -200,10 +208,10 @@ async function initPage() {
     });
 }
 
-function onPageLoad() {
+async function onPageLoad() {
     getHandles();
     addEventListeners();
-    initPage();
+    await initPage();
 }
 
 window.addEventListener('load', onPageLoad);
