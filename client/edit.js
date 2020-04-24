@@ -4,7 +4,7 @@ const pageElements = {};
 
 function getFormData() {
     const data = {
-        name: pageElements.questionnaireName.textContent,
+        name: pageElements.questionnaireName.value,
         questions: []
     };
 
@@ -172,7 +172,7 @@ async function displayQuestionnaire(id) {
         questionnaireObj = ["Error; could not load questions."]; // TODO: proper error handling
     }
 
-    pageElements.questionnaireName.textContent = questionnaireObj.name;
+    pageElements.questionnaireName.value = questionnaireObj.name;
     removeChildren(pageElements.questions);
     populateList(pageElements.questions, questionnaireObj.questions);
 
