@@ -37,6 +37,12 @@ function removeChildren(elem) {
     }
 }
 
+function removeOption(id) {
+    const option = document.querySelector(`#${id}`);
+
+    option.remove();
+}
+
 function removeQuestion(id) {
     const question = document.querySelector(`fieldset[data-id="${id}"]`);
     question.remove();
@@ -52,6 +58,8 @@ function populateList(list, data) {
 
         clone.querySelector("#text").value = i.text;
         clone.querySelector("#text").id = `text-${i.id}`;
+        clone.querySelector("legend label").style.display = "none";
+        clone.querySelector("legend label").htmlFor = `text-${i.id}`;
 
         clone.querySelector("#type").value = i.type;
         clone.querySelector("#type").addEventListener('change', (e) => updateOptionContainerVisibility(e.target));
@@ -67,9 +75,8 @@ function populateList(list, data) {
 
             let j = 1;
             for (const option of i.options) {
-                const label = document.createElement("label");
-                label.htmlFor = `option-${j}`;
-                label.textContent = `[${j}]`;
+                const li = document.createElement("li");
+                li.id = `${i.id}-${j}`;
 
                 const input = document.createElement("input");
                 input.type = "text";
@@ -78,16 +85,22 @@ function populateList(list, data) {
 
                 const button = document.createElement("button");
                 button.textContent = "Remove";
-                button.id = `remove-${i.id}`;
+                button.id = `remove-${i.id}-${j}`;
+                button.addEventListener('click', (e) => removeOption(e.target.id.split("remove-")[1]));
 
-                optionContainer.append(label, input, button);
+                li.append(input, button);
+                optionContainer.append(li);
                 j++;
             }
 
+            const buttonContainer = document.createElement("li");
+            buttonContainer.style.listStyle = "none";
+
             const buttonAdd = document.createElement("button");
-            buttonAdd.id = "add-option";
+            buttonAdd.id = `add-option-${i.id}`;
             buttonAdd.textContent = "Add an option";
-            optionContainer.append(buttonAdd);
+            buttonContainer.append(buttonAdd);
+            optionContainer.append(buttonContainer);
         }
 
         optionContainer.id = `option-container-${i.id}`;
