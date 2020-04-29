@@ -172,6 +172,37 @@ async function updateQuestionnaire() {
     }
 }
 
+function copyRespondURL(e) {
+    const a = pageElements.questionnaireLink;
+
+    navigator.permissions.query({name: "clipboard-write"}).then(result => {
+        if (result.state === "granted" || result.state === "prompt") {
+            navigator.clipboard.writeText(a.href).then(
+                () => { // on success
+                    e.target.textContent = "Copied!";
+                    setTimeout(() => {e.target.textContent = "Copy to clipboard"},  5000);
+                },
+                () => { // on failure
+                    e.target.textContent = "An error occurred.";
+                    setTimeout(() => {e.target.textContent = "Copy to clipboard"},  5000);
+                });
+        }
+    });
+}
+
+function displayQuestionnaireLink() {
+    const protocol = window.location.protocol;
+    const host = window.location.host;
+    const id = getQuestionnaireId();
+
+    const respondURL = `${protocol}//${host}/respond?q=${id}`;
+    pageElements.questionnaireLink.href = respondURL;
+    pageElements.questionnaireLink.textContent = respondURL;
+
+    const responsesURL = `${protocol}//${host}/responses?q=${id}`;
+    pageElements.responsesLink.href = responsesURL;
+}
+
 async function displayQuestionnaire() {
     const id = getQuestionnaireId();
     // If null is passed as a parameter, assume there are no questionnaires
@@ -198,6 +229,7 @@ async function displayQuestionnaire() {
 function addEventListeners() {
     pageElements.btnDeleteQuestionnaire.addEventListener('click', deleteQuestionnaire);
     pageElements.updateBtn.addEventListener('click', updateQuestionnaire);
+    pageElements.copyRespondBtn.addEventListener('click', copyRespondURL);
 }
 
 function getHandles() {
@@ -205,11 +237,15 @@ function getHandles() {
     pageElements.questionnaireName = document.querySelector("#questionnaire-name");
     pageElements.btnDeleteQuestionnaire = document.querySelector("#btn-delete-questionnaire");
     pageElements.updateBtn = document.querySelector("#update");
+    pageElements.questionnaireLink = document.querySelector("#questionnaire-link");
+    pageElements.responsesLink = document.querySelector("#responses-link");
+    pageElements.copyRespondBtn = document.querySelector("#copy-respond-btn");
 }
 
 async function initPage() {
     const id = getQuestionnaireId();
     await displayQuestionnaire(id);
+    displayQuestionnaireLink();
 }
 
 async function onPageLoad() {
