@@ -9,7 +9,20 @@ function getHandles() {
 }
 
 async function createQuestionnaire() {
+    const res = await fetch ("/questionnaires", {
+        method: "POST",
+        body: JSON.stringify({name: "Untitled Questionnaire"}),
+        headers: {'Content-Type': 'application/json'}
+    });
 
+    if (res.ok) {
+        const protocol = window.location.protocol;
+        const host = window.location.host;
+        const id = await res.json();
+        window.location = `${protocol}//${host}/edit?q=${id}`;
+    } else {
+        console.error(res.statusText); // todo: proper error handling
+    }
 }
 
 function addEventListeners() {
