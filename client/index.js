@@ -1,5 +1,8 @@
 'use strict';
 
+import * as URLUtil from "./lib/url"
+import {getQuestionnaireId} from "./lib/url";
+
 const pageElements = {};
 
 function getHandles() {
@@ -33,18 +36,9 @@ function populateTemplate(obj) {
     const clone = pageElements.questionnaireTemplate.content.cloneNode(true);
     clone.querySelector("h3").textContent = obj.name;
 
-    const protocol = window.location.protocol;
-    const host = window.location.host;
-    const id = obj.id;
-
-    const respondURL = `${protocol}//${host}/respond?q=${id}`;
-    clone.querySelector(".respond").href = respondURL;
-
-    const editURL = `${protocol}//${host}/edit?q=${id}`;
-    clone.querySelector(".edit").href = editURL;
-
-    const responsesURL = `${protocol}//${host}/responses?q=${id}`;
-    clone.querySelector(".responses").href = responsesURL;
+    clone.querySelector(".respond").href = URLUtil.getURL("respond", obj.id);
+    clone.querySelector(".edit").href = URLUtil.getURL("edit", obj.id);
+    clone.querySelector(".responses").href = URLUtil.getURL("responses", obj.id);
 
     pageElements.questionnaireContainer.append(clone);
 }

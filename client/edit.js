@@ -1,11 +1,8 @@
 'use strict';
 
-const pageElements = {};
+import * as URLUtil from "./lib/url"
 
-function getQuestionnaireId() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("q");
-}
+const pageElements = {};
 
 function getFormData() {
     const data = {
@@ -145,8 +142,8 @@ function updateOptionContainerVisibility(target) {
     }
 }
 
-async function deleteQuestionnaire(id) {
-    const response = await fetch(`questionnaires/${id}`, {
+async function deleteQuestionnaire() {
+    const response = await fetch(`questionnaires/${URLUtil.getQuestionnaireId()}`, {
         method: 'DELETE',
     });
 
@@ -158,8 +155,7 @@ async function deleteQuestionnaire(id) {
 }
 
 async function updateQuestionnaire() {
-    const id = getQuestionnaireId();
-    const response = await fetch(`questionnaires/${id}`, {
+    const response = await fetch(`questionnaires/${URLUtil.getQuestionnaireId()}`, {
         method: 'PUT',
         body: JSON.stringify(getFormData()),
         headers: {'Content-Type': 'application/json'}
@@ -191,20 +187,15 @@ function copyRespondURL(e) {
 }
 
 function displayQuestionnaireLink() {
-    const protocol = window.location.protocol;
-    const host = window.location.host;
-    const id = getQuestionnaireId();
-
-    const respondURL = `${protocol}//${host}/respond?q=${id}`;
+    const respondURL = URLUtil.getURL("respond", URLUtil.getQuestionnaireId());
     pageElements.questionnaireLink.href = respondURL;
     pageElements.questionnaireLink.textContent = respondURL;
 
-    const responsesURL = `${protocol}//${host}/responses?q=${id}`;
-    pageElements.responsesLink.href = responsesURL;
+    pageElements.responsesLink.href = URLUtil.getURL("responses", URLUtil.getQuestionnaireId());
 }
 
 async function displayQuestionnaire() {
-    const id = getQuestionnaireId();
+    const id = URLUtil.getQuestionnaireId();
     // If null is passed as a parameter, assume there are no questionnaires
     if (id === null) {
         pageElements.questionnaireName.textContent = "No questionnaires to display.";
@@ -243,8 +234,7 @@ function getHandles() {
 }
 
 async function initPage() {
-    const id = getQuestionnaireId();
-    await displayQuestionnaire(id);
+    await displayQuestionnaire();
     displayQuestionnaireLink();
 }
 

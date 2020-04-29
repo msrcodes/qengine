@@ -6,7 +6,7 @@ const resp = require("./server/responses");
 
 const app = express();
 
-app.use(express.static('client', {extensions: ['html']}));
+app.use(express.static('client', {extensions: ['html', 'js']}));
 
 function addResponse(req, res) {
     const response = resp.addResponse(req.params.id, req.body);

@@ -1,14 +1,11 @@
 'use strict';
 
+import * as URLUtil from "./lib/url"
+
 const pageElements = {};
 
-function getQuestionnaireId() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("q");
-}
-
 async function getResponses() {
-    const response = await fetch(`/responses/${getQuestionnaireId()}`);
+    const response = await fetch(`/responses/${URLUtil.getQuestionnaireId()}`);
 
     let responses;
     if (response.ok) {
@@ -21,7 +18,7 @@ async function getResponses() {
 }
 
 async function getQuestionnaire() {
-    const response = await fetch(`/questionnaires/${getQuestionnaireId()}`);
+    const response = await fetch(`/questionnaires/${URLUtil.getQuestionnaireId()}`);
 
     let qnr;
     if (response.ok) {

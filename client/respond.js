@@ -1,5 +1,7 @@
 'use strict';
 
+import * as URLUtil from "./lib/url"
+
 const pageElements = {};
 
 function getTemplateFromType(type) {
@@ -11,11 +13,6 @@ function getTemplateFromType(type) {
     };
 
     return dictionary[type];
-}
-
-function getQuestionnaireId() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("q");
 }
 
 function getFormData() {
@@ -53,10 +50,10 @@ function getFormData() {
     return data;
 }
 
-async function postResponse(questionnaireID) {
+async function postResponse() {
     const payload = getFormData();
 
-    const response = await fetch(`responses/${questionnaireID}`, {
+    const response = await fetch(`responses/${URLUtil.getQuestionnaireId()}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(payload),
@@ -121,7 +118,7 @@ function displayQuestionnaire(obj) {
     const submit = document.createElement("input");
     submit.type = "submit";
     submit.id = "submit";
-    submit.addEventListener('click', () => postResponse(getQuestionnaireId()));
+    submit.addEventListener('click', postResponse);
     pageElements.qnrContainer.append(submit);
 }
 
@@ -138,8 +135,7 @@ function getHandles() {
 }
 
 async function loadQuestionnaire() {
-    const id = getQuestionnaireId();
-    const response = await fetch(`questionnaires/${id}`);
+    const response = await fetch(`questionnaires/${URLUtil.getQuestionnaireId()}`);
 
     let qnr;
     if (response.ok) {
