@@ -37,6 +37,10 @@ function getQuestionnaires(req, res) {
     res.json(qnr.getQuestionnaires());
 }
 
+function getQuestionnaireInfo(req, res) {
+    res.json(qnr.getQuestionnaireIDs());
+}
+
 function getQuestionnaire(req, res) {
     const questionnaire = qnr.getQuestionnaire(req.params.id);
 
@@ -120,6 +124,8 @@ app.post('/questionnaires', express.json(), addQuestionnaire);
 app.delete('/questionnaires/:id', deleteQuestionnaire);
 
 app.get('/questionnaires/:id', getQuestionnaire);
+
+app.get('/questionnaireInfo', getQuestionnaireInfo);
 
 app.get('/questionnaires', getQuestionnaires);
 

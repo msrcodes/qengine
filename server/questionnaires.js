@@ -12,6 +12,16 @@ function getQuestionnaires() {
     return questionnaires;
 }
 
+function getQuestionnaireInfo() {
+    const ret = [];
+
+    for (const key of Object.keys(questionnaires)) {
+        ret.push({id: key, name: questionnaires[key].name});
+    }
+
+    return ret;
+}
+
 /**
  * Used to retrieve a specific questionnaire
  * @param id The id of the questionnaire to retrieve
@@ -143,6 +153,7 @@ function addQuestion(questionnaireId, questionText, questionType, questionOption
 
 module.exports = {
     getQuestionnaires,
+    getQuestionnaireIDs: getQuestionnaireInfo,
     getQuestionnaire,
     deleteQuestionnaire,
     updateQuestionnaire,
