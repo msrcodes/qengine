@@ -3,7 +3,8 @@
 const pageElements = {};
 
 function getQuestionnaireId() {
-    return window.location.hash.substring(1);
+    const params = new URLSearchParams(window.location.search);
+    return params.get("q");
 }
 
 async function getResponses() {

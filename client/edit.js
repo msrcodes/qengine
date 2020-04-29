@@ -2,6 +2,11 @@
 
 const pageElements = {};
 
+function getQuestionnaireId() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("q");
+}
+
 function getFormData() {
     const data = {
         name: pageElements.questionnaireName.value,
@@ -131,15 +136,6 @@ function populateList(list, data) {
     }
 }
 
-function populateSelect(select, data) {
-    for (const i of data) {
-        const child = document.createElement("option");
-        child.value = i;
-        child.textContent = i;
-        select.append(child);
-    }
-}
-
 function updateOptionContainerVisibility(target) {
     const optionContainer = document.querySelector(`#option-container-${target.id.split("-")[1]}`);
     if (target.value === "single-select" || target.value === "multi-select") {
@@ -161,7 +157,8 @@ async function deleteQuestionnaire(id) {
     }
 }
 
-async function updateQuestionnaire(id) {
+async function updateQuestionnaire() {
+    const id = getQuestionnaireId();
     const response = await fetch(`questionnaires/${id}`, {
         method: 'PUT',
         body: JSON.stringify(getFormData()),
@@ -175,12 +172,12 @@ async function updateQuestionnaire(id) {
     }
 }
 
-async function displayQuestionnaire(id) {
+async function displayQuestionnaire() {
+    const id = getQuestionnaireId();
     // If null is passed as a parameter, assume there are no questionnaires
     if (id === null) {
         pageElements.questionnaireName.textContent = "No questionnaires to display.";
         removeChildren(pageElements.questions);
-        pageElements.btnDeleteQuestionnaire.dataset.id = undefined;
         return; // Short
     }
 
@@ -196,50 +193,23 @@ async function displayQuestionnaire(id) {
     pageElements.questionnaireName.value = questionnaireObj.name;
     removeChildren(pageElements.questions);
     populateList(pageElements.questions, questionnaireObj.questions);
-
-    pageElements.btnDeleteQuestionnaire.dataset.id = id;
-}
-
-async function populateQuestionnairesDropdown() { // TODO: only display questionnaires created by the user
-    const response = await fetch('questionnaires');
-
-    let questionnairesObj;
-    if (response.ok) {
-        questionnairesObj = await response.json();
-    } else {
-        questionnairesObj = ["Error; could not load questionnaires."]; // TODO: proper error handling
-    }
-
-    const keys = Object.keys(questionnairesObj);
-
-    removeChildren(pageElements.questionnaireInput);
-    populateSelect(pageElements.questionnaireInput, keys);
-
-    return keys;
 }
 
 function addEventListeners() {
-    pageElements.questionnaireInput.addEventListener('change', (e) => displayQuestionnaire(e.target.value));
-    pageElements.btnDeleteQuestionnaire.addEventListener('click', (e) => deleteQuestionnaire(e.target.dataset.id));
-    pageElements.updateBtn.addEventListener('click', () => updateQuestionnaire(pageElements.btnDeleteQuestionnaire.dataset.id));
+    pageElements.btnDeleteQuestionnaire.addEventListener('click', deleteQuestionnaire);
+    pageElements.updateBtn.addEventListener('click', updateQuestionnaire);
 }
 
 function getHandles() {
     pageElements.questions = document.querySelector("#questions");
     pageElements.questionnaireName = document.querySelector("#questionnaire-name");
-    pageElements.questionnaireInput = document.querySelector("#input-questionnaire");
     pageElements.btnDeleteQuestionnaire = document.querySelector("#btn-delete-questionnaire");
     pageElements.updateBtn = document.querySelector("#update");
 }
 
 async function initPage() {
-    populateQuestionnairesDropdown().then(keys => {
-        if (keys.length === 0) {
-            displayQuestionnaire(null);
-        } else {
-            displayQuestionnaire(keys[0]);
-        }
-    });
+    const id = getQuestionnaireId();
+    await displayQuestionnaire(id);
 }
 
 async function onPageLoad() {
