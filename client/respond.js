@@ -18,7 +18,6 @@ function getTemplateFromType(type) {
 function getFormData() {
     const data = {};
     const fieldsets = document.querySelectorAll("#questionnaire-container > fieldset");
-
     for (const fieldset of fieldsets) {
         if (fieldset.classList.contains("option-container")) {  // if question is single-choice or multi-choice
             let checked = [];
@@ -76,6 +75,7 @@ function displayQuestion(data) {
 
     // clone template
     const templateClone = template.content.cloneNode(true);
+    templateClone.querySelector("fieldset").dataset.id = data.id;
     
     // populate templateClone with data
     templateClone.querySelector(".text").textContent = data.text;

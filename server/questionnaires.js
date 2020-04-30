@@ -3,11 +3,8 @@
 const uuid = require('uuid-random');
 
 const questionnaires = require("./test-questionnaires");
+const validateLib = require("./validate");
 
-/**
- * Used to retrieve all currently stored questionnaires
- * @returns Object A JS object containing all stored questionnaires
- */
 function getQuestionnaires() {
     return questionnaires;
 }
@@ -22,23 +19,39 @@ function getQuestionnaireInfo() {
     return ret;
 }
 
-/**
- * Used to retrieve a specific questionnaire
- * @param id The id of the questionnaire to retrieve
- * @returns {Object | undefined} A JS object, the questionnaire found
- */
 function getQuestionnaire(id) {
     return questionnaires[id];
 }
 
+function deleteQuestionnaire(id) {
+    const questionnaire = getQuestionnaire(id); // Get questionnaire from memory
+
+    if (questionnaire === undefined)    // If no questionnaire exists for that ID, short
+        return undefined;
+
+    delete questionnaires[id];  // If a questionnaire exists for that ID, delete it
+
+    return questionnaires;  // Return the updated list of questionnaires
+}
+
 function addQuestionnaire(name, questions, id) {
     // if required parameter value is not defined, return HTTP bad request error code
-    if (name === undefined)
-        return 400;
+    if (name === undefined) {
+        return {
+            valid: false,
+            reason: `Missing required parameter. name: '${name}'`,
+            code: 400
+        };
+    }
 
     // if an id is defined, and a questionnaire already exists with that id, return HTTP bad request error code
-    if (id !== undefined && getQuestionnaire(id) !== undefined)
-        return 400;
+    if (id !== undefined && getQuestionnaire(id) !== undefined) {
+        return {
+            valid: false,
+            reason: `Questionnaire already exists with id '${id}'`,
+            code: 400
+        };
+    }
 
     // if optional parameter values are not defined, generate default values instead
     const qnrId = id === undefined ? uuid() : id;
@@ -52,45 +65,36 @@ function addQuestionnaire(name, questions, id) {
 
     for (const question of qnrQs) {
         const res = addQuestion(qnrId, question.text, question.type, question.options, question.id);
-        if (res === "invalid type" || res === "invalid options") {
+        if (res.valid) {
+            questionnaires[qnrId] = res.questionnaire;
+        } else {
             delete questionnaires[qnrId];
-            return 400;
+            return res;
         }
     }
 
-    return qnrId;
-}
-
-/**
- * Used to delete a specific questionnaire
- * @param id The id of the questionnaire to delete
- * @returns {Object | undefined} A JS object, the updated list of all stored questionnaires
- */
-function deleteQuestionnaire(id) {
-    const questionnaire = getQuestionnaire(id); // Get questionnaire from memory
-
-    if (questionnaire === undefined)    // If no questionnaire exists for that ID, short
-        return undefined;
-
-    delete questionnaires[id];  // If a questionnaire exists for that ID, delete it
-
-    return questionnaires;  // Return the updated list of questionnaires
+    return {valid: true, id: qnrId, code: 200};
 }
 
 function updateQuestionnaire(name, questions, id) {
     // if any required parameter is missing, return HTTP Bad Request code
-    if (name === undefined || questions === undefined || id === undefined)
-        return 400;
+    if (name === undefined || questions === undefined || id === undefined) {
+        return {
+            valid: false,
+            reason: `Missing required parameter. name: '${name}', questions: '${questions}', id: '${id}'`,
+            code: 400
+        };
+    }
 
     // if no matching questionnaire is found, return HTTP Not Found code
     if (getQuestionnaire(id) === undefined)
-        return 404;
+        return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
 
     // check all questions are valid
     for (const question of questions) {
-        const validate = validateQuestion(question.type, question.options);
-        if (validate !== true) {
-            return 400;
+        const res = validateLib.validateQuestion(question);
+        if (!res.valid) {
+            return res;
         }
     }
 
@@ -100,21 +104,7 @@ function updateQuestionnaire(name, questions, id) {
         questions: questions
     };
 
-    return 200;
-}
-
-function validateQuestion(questionType, questionOptions) {
-    const validTypes = ["text", "number", "single-select", "multi-select"];
-    if (!validTypes.includes(questionType))
-        return "invalid type";
-
-    if (questionType === "single-select" || questionType === "multi-select") {
-        if (questionOptions == null) return "invalid options";
-
-        if (questionOptions.length === 0) return "invalid options";
-    }
-
-    return true;
+    return {valid: true, code: 200};
 }
 
 /**
@@ -131,12 +121,8 @@ function addQuestion(questionnaireId, questionText, questionType, questionOption
 
     const qId = questionId === undefined ? uuid() : questionId;
 
-    if (questionnaire === undefined)
-        return undefined;
-
-    const validate = validateQuestion(questionType, questionOptions);
-    if (validate !== true) {
-        return validate;
+    if (questionnaire === undefined) {
+        return {valid: false, reason: `No questionnaire could be found with id '${questionnaireId}'`, code: 404};
     }
 
     const question = {
@@ -146,9 +132,14 @@ function addQuestion(questionnaireId, questionText, questionType, questionOption
         options: questionOptions
     };
 
+    const res = validateLib.validateQuestion(question);
+    if (!res.valid) {
+        return res;
+    }
+
     questionnaire.questions = [...questionnaire.questions, question];
 
-    return questionnaire;
+    return {valid: true, questionnaire, code: 200};
 }
 
 module.exports = {

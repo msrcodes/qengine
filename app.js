@@ -66,49 +66,34 @@ function deleteQuestionnaire(req, res) {
 function addQuestionnaire(req, res) {
     const response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
 
-    if (response === 400) {
-        res.status(400).send('Bad request.');
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
         return;
     }
 
-    res.json(response);
+    res.json(response.id);
 }
 
 function updateQuestionnaire(req, res) {
     const response = qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
 
-    if (response === 400) {
-        res.status(400).send("Bad request");
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
         return;
     }
 
-    if (response === 404) {
-        res.status(404).send("Questionnaire not found");
-        return;
-    }
-
-    res.json(response);
+    res.json(response.code);
 }
 
 function addQuestion(req, res) {
     const response = qnr.addQuestion(req.params.id, req.body.text, req.body.type, req.body.options);
 
-    if (response === undefined) {
-        res.status(404).send('No match for that ID.');
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
         return;
     }
 
-    if (response === "invalid type") {
-        res.status(400).send('Invalid question type.');
-        return;
-    }
-
-    if (response === "invalid options") {
-        res.status(400).send('Invalid question options.');
-        return;
-    }
-
-    res.json(response); // return updated questionnaire
+    res.json(response.questionnaire); // return updated questionnaire
 }
 
 app.post('/responses/:id', express.json(), addResponse);

@@ -192,7 +192,7 @@ test('Add questionnaire via route', async () => {
                 ]
             });
         } else {
-            expect(res.ok).toBe(true);
+            expect(res2.ok).toBe(true);
         }
     } else {
         expect(res.ok).toBe(true);
