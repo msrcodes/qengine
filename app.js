@@ -11,11 +11,8 @@ app.use(express.static('client', {extensions: ['html', 'js']}));
 function addResponse(req, res) {
     const response = resp.addResponse(req.params.id, req.body);
 
-    if (response === 404) {
-        res.status(404).send("Questionnaire not found");
-        return;
-    } else if (response === 400) {
-        res.status(400).send("Bad request");
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
         return;
     }
 

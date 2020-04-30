@@ -57,52 +57,37 @@ function addQuestionnaire(name, questions, id) {
     const qnrId = id === undefined ? uuid() : id;
     const qnrQs = questions === undefined ? [] : questions;
 
-    // add questionnaire to storage
-    questionnaires[qnrId] = {
-        name: name,
-        questions: []
-    };
+    const qnr = {name: name, questions: qnrQs};
 
-    for (const question of qnrQs) {
-        const res = addQuestion(qnrId, question.text, question.type, question.options, question.id);
-        if (res.valid) {
-            questionnaires[qnrId] = res.questionnaire;
-        } else {
-            delete questionnaires[qnrId];
-            return res;
-        }
+    const res = validateLib.validateQuestionnaire(qnr);
+    if (!res.valid) {
+        return res;
     }
+
+    // add questionnaire to storage
+    questionnaires[qnrId] = qnr;
 
     return {valid: true, id: qnrId, code: 200};
 }
 
 function updateQuestionnaire(name, questions, id) {
-    // if any required parameter is missing, return HTTP Bad Request code
-    if (name === undefined || questions === undefined || id === undefined) {
-        return {
-            valid: false,
-            reason: `Missing required parameter. name: '${name}', questions: '${questions}', id: '${id}'`,
-            code: 400
-        };
-    }
+    const questionnaire = {
+        name,
+        questions
+    };
 
     // if no matching questionnaire is found, return HTTP Not Found code
     if (getQuestionnaire(id) === undefined)
         return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
 
-    // check all questions are valid
-    for (const question of questions) {
-        const res = validateLib.validateQuestion(question);
-        if (!res.valid) {
-            return res;
-        }
+    const res = validateLib.validateQuestionnaire(questionnaire);
+
+    if (!res.valid) {
+        return res;
     }
 
     // update questionnaire
-    questionnaires[id] = {
-        name: name,
-        questions: questions
-    };
+    questionnaires[id] = questionnaire;
 
     return {valid: true, code: 200};
 }

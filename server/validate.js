@@ -1,5 +1,7 @@
 'use strict';
 
+const questionnaires = require("./questionnaires");
+
 const QUESTION_TYPES = {
     TEXT: {
         id: "text",
@@ -61,6 +63,26 @@ function validateQuestion(question) {
     return {valid: true, code: 200};
 }
 
+function validateQuestionnaire(qnr) {
+    if (qnr.name === undefined || qnr.questions === undefined) {
+        return {
+            valid: false,
+            reason: `Missing required parameter. name: '${qnr.name}', questions: '${qnr.questions}'`,
+            code: 400
+        };
+    }
+
+    // check all questions are valid
+    for (const question of qnr.questions) {
+        const res = validateQuestion(question);
+        if (!res.valid) {
+            return res;
+        }
+    }
+
+    return {valid: true, code: 200};
+}
+
 function validateResponse(response, question) {
     // Validation rule 1
     const type = getTypeFromID(question.type);
@@ -68,28 +90,6 @@ function validateResponse(response, question) {
         return {
             valid: false,
             reason: "Question must be of valid question type",
-            response,
-            question,
-            code: 400
-        };
-    }
-
-    // Validation rule 2
-    if (type.hasOptions === false && response.options != null) {
-        return {
-            valid: false,
-            reason: "Question options must be null if hasOptions is false",
-            response,
-            question,
-            code: 400
-        };
-    }
-
-    // Validation rule 3
-    if (type.hasOptions === true && response.options == null) {
-        return {
-            valid: false,
-            reason: "Question options must be defined if hasOptions is true",
             response,
             question,
             code: 400
@@ -120,7 +120,7 @@ function validateResponse(response, question) {
 
     // Validation rule 5.5
     if (type.uniqueOptions === false) {
-        for (const option of response.options) {
+        for (const option of response) {
             if (!question.options.includes(option)) {
                 return {
                     valid: false,
@@ -148,11 +148,19 @@ function validateResponse(response, question) {
 }
 
 function validateQNRResponse(response, questionnaire) {
+    // Check questionnaire exists
+    if (questionnaire == null) {
+        return {
+            valid: false,
+            reason: "Questionnaire could not be found",
+            code: 404
+        }
+    }
+
     // Check all required questions have been answered
-    for (const key of Object.keys(questionnaire)) {
-        const question = questionnaire[key];
+    for (const question of questionnaire.questions) {
         if (question.required == null || question.required === true) {
-            if (response[key] == null) {
+            if (response[question.id] == null) {
                 return {
                     valid: false,
                     reason: "All required questions must be answered",
@@ -164,7 +172,16 @@ function validateQNRResponse(response, questionnaire) {
 
     // Check response does not contain any additional data
     for (const key of Object.keys(response)) {
-        if (questionnaire[key] == null) {
+        let foundMatch = false;
+
+        for (const question of questionnaire.questions) {
+            if (key === question.id) {
+                foundMatch = true;
+                break;
+            }
+        }
+
+        if (!foundMatch) {
             return {
                 valid: false,
                 reason: "Response must not contain any additional data",
@@ -174,8 +191,8 @@ function validateQNRResponse(response, questionnaire) {
     }
 
     // Follow question-based validation rules
-    for (const key of Object.keys(questionnaire)) {
-        const validate = validateResponse(response[key], questionnaire[key]);
+    for (const question of questionnaire.questions) {
+        const validate = validateResponse(response[question.id], question);
         if (!validate.valid) {
             return validate;
         }
@@ -188,6 +205,7 @@ module.exports = {
     QUESTION_TYPES,
     getQuestionTypes,
     validateQuestion,
+    validateQuestionnaire,
     validateResponse,
     validateQNRResponse
 };
