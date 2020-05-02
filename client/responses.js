@@ -128,13 +128,34 @@ function addResponse(response, i) {
     }
 }
 
+function addGraph(question) {
+    const ul = document.querySelector(`[data-id~="${question.id}"]`);
+    const lis = ul.querySelectorAll("li");
+    const obj = {};
+
+    for (const li of lis) {
+        obj[li.dataset.option] = Number(li.querySelector("span").textContent);
+    }
+
+    const graph = document.createElement("custom-bar-graph");
+    graph.dataset.value = JSON.stringify(obj);
+    graph.dataset.title = question.text;
+
+    ul.insertAdjacentElement('afterend', graph);
+}
+
 async function initPage() {
     const qnr = await getQuestionnaire();
 
     pageElements.qnrName.textContent = qnr.name;
 
+    const questionsToGraph = [];
     for (const question of qnr.questions) { // Create containers for question responses
         addResponseContainer(question);
+
+        if (question.type === "single-select" || question.type === "multi-select") {
+            questionsToGraph.push(question);
+        }
     }
 
     const responses = await getResponses();
@@ -143,6 +164,10 @@ async function initPage() {
     for (const response of responses) {
         addResponse(response, i);
         i++;
+    }
+
+    for (const question of questionsToGraph) {
+        addGraph(question);
     }
 }
 
