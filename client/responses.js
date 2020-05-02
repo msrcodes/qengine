@@ -33,6 +33,7 @@ async function getQuestionnaire() {
 function getHandles() {
     pageElements.qnrName = document.querySelector("#questionnaire-name");
     pageElements.respContainer = document.querySelector("#responses-container");
+    pageElements.exportJSON = document.querySelector("#export-json");
 }
 
 function addResponseContainer(question) {
@@ -171,8 +172,30 @@ async function initPage() {
     }
 }
 
+async function exportToFile(format) {
+    const responses = await getResponses();
+    const timestamp = Date.now();
+    if (format === "json") {
+        const a = document.createElement("a");
+        a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(responses)));
+        a.setAttribute("download", `export-${timestamp}.json`);
+
+        a.style.display = "none";
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+    }
+}
+
+function addEventListeners() {
+    pageElements.exportJSON.addEventListener('click', async () => await exportToFile("json"));
+}
+
 async function onPageLoad() {
     getHandles();
+    addEventListeners();
     await initPage();
 }
 
