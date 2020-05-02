@@ -80,6 +80,12 @@ function updateQuestionnaire(name, questions, id) {
     if (getQuestionnaire(id) === undefined)
         return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
 
+    for (const question of questionnaire.questions) {
+        if (question.id === "undefined" || question.id == null) {
+            question.id = uuid();
+        }
+    }
+
     const res = validateLib.validateQuestionnaire(questionnaire);
 
     if (!res.valid) {

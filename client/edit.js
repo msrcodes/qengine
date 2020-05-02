@@ -85,51 +85,53 @@ function addOption(container, option, id) {
     }
 }
 
-function populateList(list, data) {
-    let index = 0;
-    for (const i of data) {
-        const template = document.getElementById("template-question");
-        const clone = template.content.cloneNode(true);
+function addQuestion(question, container) {
+    const template = document.getElementById("template-question");
+    const clone = template.content.cloneNode(true);
 
-        clone.querySelector("fieldset").dataset.id = i.id;
+    clone.querySelector("fieldset").dataset.id = question.id;
 
-        clone.querySelector("#text").value = i.text;
-        clone.querySelector("#text").id = `text-${i.id}`;
-        clone.querySelector("legend label").style.display = "none";
-        clone.querySelector("legend label").htmlFor = `text-${i.id}`;
+    clone.querySelector("#text").value = question.text;
+    clone.querySelector("#text").id = `text-${question.id}`;
+    clone.querySelector("legend label").style.display = "none";
+    clone.querySelector("legend label").htmlFor = `text-${question.id}`;
 
-        clone.querySelector("#type").value = i.type;
-        clone.querySelector("#type").addEventListener('change', (e) => updateOptionContainerVisibility(e.target));
-        clone.querySelector("#type").id = `type-${i.id}`;
+    clone.querySelector("#type").value = question.type;
+    clone.querySelector("#type").addEventListener('change', (e) => updateOptionContainerVisibility(e.target));
+    clone.querySelector("#type").id = `type-${question.id}`;
 
-        clone.querySelector("#delete-question").addEventListener('click', () => removeQuestion(i.id));
-        clone.querySelector("#delete-question").id = `delete-question-${i.id}`;
+    clone.querySelector("#delete-question").addEventListener('click', () => removeQuestion(question.id));
+    clone.querySelector("#delete-question").id = `delete-question-${question.id}`;
 
-        const optionContainer = clone.querySelector("#option-container");
+    const optionContainer = clone.querySelector("#option-container");
 
-        if (i.type === "single-select" || i.type === "multi-select") {
-            optionContainer.classList.remove("hidden");
+    if (question.type === "single-select" || question.type === "multi-select") {
+        optionContainer.classList.remove("hidden");
 
-            for (const option of i.options) {
-                addOption(optionContainer, option, i.id);
-            }
-
-            const buttonContainer = document.createElement("li");
-            buttonContainer.style.listStyle = "none";
-            buttonContainer.id = `add-option-container-${i.id}`;
-
-            const buttonAdd = document.createElement("button");
-            buttonAdd.id = `add-option-${i.id}`;
-            buttonAdd.textContent = "Add an option";
-            buttonAdd.addEventListener('click', () => addOption(optionContainer, "", i.id));
-            buttonContainer.append(buttonAdd);
-            optionContainer.append(buttonContainer);
+        for (const option of question.options) {
+            addOption(optionContainer, option, question.id);
         }
 
-        optionContainer.id = `option-container-${i.id}`;
+        const buttonContainer = document.createElement("li");
+        buttonContainer.style.listStyle = "none";
+        buttonContainer.id = `add-option-container-${question.id}`;
 
-        list.append(clone);
-        index++;
+        const buttonAdd = document.createElement("button");
+        buttonAdd.id = `add-option-${question.id}`;
+        buttonAdd.textContent = "Add an option";
+        buttonAdd.addEventListener('click', () => addOption(optionContainer, "", question.id));
+        buttonContainer.append(buttonAdd);
+        optionContainer.append(buttonContainer);
+    }
+
+    optionContainer.id = `option-container-${question.id}`;
+
+    container.append(clone);
+}
+
+function addQuestions(container, questions) {
+    for (const question of questions) {
+        addQuestion(question, container);
     }
 }
 
@@ -214,13 +216,19 @@ async function displayQuestionnaire() {
 
     pageElements.questionnaireName.value = questionnaireObj.name;
     removeChildren(pageElements.questions);
-    populateList(pageElements.questions, questionnaireObj.questions);
+    addQuestions(pageElements.questions, questionnaireObj.questions);
 }
 
 function addEventListeners() {
     pageElements.btnDeleteQuestionnaire.addEventListener('click', deleteQuestionnaire);
     pageElements.updateBtn.addEventListener('click', updateQuestionnaire);
     pageElements.copyRespondBtn.addEventListener('click', copyRespondURL);
+    pageElements.addQuestionBtn.addEventListener('click', () => {
+       addQuestion({
+           text: "New Question",
+           type: "text"
+       }, pageElements.questions);
+    });
 }
 
 function getHandles() {
@@ -231,6 +239,7 @@ function getHandles() {
     pageElements.questionnaireLink = document.querySelector("#questionnaire-link");
     pageElements.responsesLink = document.querySelector("#responses-link");
     pageElements.copyRespondBtn = document.querySelector("#copy-respond-btn");
+    pageElements.addQuestionBtn = document.querySelector("#add-question");
 }
 
 async function initPage() {

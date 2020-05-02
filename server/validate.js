@@ -60,6 +60,11 @@ function validateQuestion(question) {
         return {valid: false, reason: "Question options must be defined if hasOptions is true", code: 400};
     }
 
+    // Validation rule 4
+    if (question.id == null) {
+        return {valid: false, reason: "Question must have ID", code: 400};
+    }
+
     return {valid: true, code: 200};
 }
 
