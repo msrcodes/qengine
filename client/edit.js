@@ -148,7 +148,7 @@ async function deleteQuestionnaire() {
     });
 
     if (response.ok) {
-        await initPage();
+        window.location = "/";
     } else {
         console.log("failed to delete questionnaire", response);    // TODO: proper error handling
     }
