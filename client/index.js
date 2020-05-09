@@ -1,7 +1,6 @@
 'use strict';
 
 import * as URLUtil from "./lib/url"
-import {getQuestionnaireId} from "./lib/url";
 
 const pageElements = {};
 
@@ -19,10 +18,8 @@ async function createQuestionnaire() {
     });
 
     if (res.ok) {
-        const protocol = window.location.protocol;
-        const host = window.location.host;
         const id = await res.json();
-        window.location = `${protocol}//${host}/edit?q=${id}`;
+        window.location = URLUtil.getURL("edit", id);
     } else {
         console.error(res.statusText); // todo: proper error handling
     }
