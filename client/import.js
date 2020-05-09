@@ -7,15 +7,6 @@ const pageElements = {};
 async function createFromJSON() {
     const text = pageElements.jsonInput.value;
 
-    try {
-        JSON.parse(text);
-    } catch (e) {
-        // if JSON is invalid
-        pageElements.errorText.textContent = "Invalid JSON";
-        pageElements.jsonInput.style.borderColor = "red"; // TODO: use CSS classes
-        return;
-    }
-
     pageElements.importBtn.disabled = "disabled";
     pageElements.errorText.textContent = "";
     pageElements.jsonInput.style.borderColor = ""; // TODO: use CSS classes
@@ -30,7 +21,14 @@ async function createFromJSON() {
         const id = await res.json();
         window.location = URLUtil.getURL("edit", id);
     } else {
-        pageElements.errorText.textContent = res.statusText;
+        const errorText = await res.text();
+
+        if (errorText.includes("SyntaxError")) {
+            pageElements.errorText.textContent = "Malformed JSON.";
+        } else {
+            pageElements.errorText.textContent = errorText;
+        }
+
         pageElements.jsonInput.style.borderColor = "red"; // TODO: use CSS classes
         pageElements.importBtn.disabled = "";
     }
