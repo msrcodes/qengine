@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <title>QEngine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="lib/auth.js"></script>
     <script src="index.js" type="module"></script>
 </head>
 <body>
 <h1>QEngine</h1>
+<div class="g-signin2" data-onsuccess="onSignIn"></div>
+<a href="#" onclick="signOut();">Sign out</a>
 <h2>Create a new Questionnaire</h2>
 <button id="create">Create from scratch</button>
 <a href="/import"><button>Import from JSON</button></a>

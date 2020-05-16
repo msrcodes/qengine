@@ -1,12 +1,24 @@
 'use strict';
 
 const express = require('express');
+const auth = require("./server/auth");
 const qnr = require("./server/questionnaires");
 const resp = require("./server/responses");
 
 const app = express();
 
 app.use(express.static('client', {extensions: ['html', 'js']}));
+
+async function verifyToken(req, res) {
+    const response = await auth.verifyToken(req.body.idtoken);
+
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
+        return;
+    }
+
+    res.json(response);
+}
 
 function addResponse(req, res) {
     const response = resp.addResponse(req.params.id, req.body);
@@ -92,6 +104,8 @@ function addQuestion(req, res) {
 
     res.json(response.questionnaire); // return updated questionnaire
 }
+
+app.post('/auth', express.urlencoded({extended: true}), verifyToken);
 
 app.post('/responses/:id', express.json(), addResponse);
 
