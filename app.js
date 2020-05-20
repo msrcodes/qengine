@@ -47,7 +47,12 @@ function getQuestionnaires(req, res) {
 }
 
 function getQuestionnaireInfo(req, res) {
-    res.json(qnr.getQuestionnaireIDs());
+    const id = req.params.id;
+    if (id != null) {
+        res.json(qnr.getQuestionnaireIDs(id));
+    } else {
+        res.json(qnr.getQuestionnaireIDs());
+    }
 }
 
 function getQuestionnaire(req, res) {
@@ -122,6 +127,8 @@ app.delete('/questionnaires/:id', deleteQuestionnaire);
 app.get('/questionnaires/:id', getQuestionnaire);
 
 app.get('/questionnaireInfo', getQuestionnaireInfo);
+
+app.get('/questionnaireInfo/:id', getQuestionnaireInfo);
 
 app.get('/questionnaires', getQuestionnaires);
 

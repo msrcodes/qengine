@@ -40,8 +40,35 @@ function populateTemplate(obj) {
     pageElements.questionnaireContainer.append(clone);
 }
 
-async function initPage() {
-    const res = await fetch("/questionnaireInfo");
+function initAuth() {
+    const auth2 = gapi.auth2.init();
+
+    // if (auth2.isSignedIn.get()) {
+    //     const user = auth2.currentUser.get();
+    //     console.log(user.getId());
+    // } else {
+    //     console.log("Not signed in");
+    // }
+
+    auth2.isSignedIn.listen(initPage);
+
+    return auth2;
+}
+
+async function initPage(signedIn) {
+    let userId;
+    if (signedIn) {
+        const auth2 = gapi.auth2.init();
+        const user = auth2.currentUser.get();
+        userId = user.getId();
+    }
+
+    let res;
+    if (userId != null) {
+        res = await fetch(`/questionnaireInfo/${userId}`);
+    } else {
+        res = await fetch("/questionnaireInfo/");
+    }
 
     if (res.ok) {
         const json = await res.json();
@@ -56,7 +83,8 @@ async function initPage() {
 async function onPageLoad() {
     getHandles();
     addEventListeners();
-    await initPage();
+    initAuth();
+    await initPage(false);
 }
 
 window.addEventListener('load', onPageLoad);

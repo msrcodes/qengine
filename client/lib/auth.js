@@ -8,7 +8,8 @@ async function onSignIn(googleUser) {
     });
 
     if (res.ok) {
-        console.log("yes");
+        const json = await res.json();
+        console.log(json);
     } else {
         console.log("no");
     }

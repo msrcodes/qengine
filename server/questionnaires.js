@@ -2,6 +2,9 @@
 
 const uuid = require('uuid-random');
 
+const users = {
+    "106927976972072440406": ["example-questionnaire", "second-questionnaire"]
+};
 const questionnaires = require("./test-questionnaires");
 const validateLib = require("./validate");
 
@@ -9,7 +12,9 @@ function getQuestionnaires() {
     return questionnaires;
 }
 
-function getQuestionnaireInfo() {
+function getQuestionnaireInfo(userId) {
+    console.log(userId);
+
     const ret = [];
 
     for (const key of Object.keys(questionnaires)) {
