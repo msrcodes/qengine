@@ -12,11 +12,23 @@ function getHandles() {
 }
 
 async function createQuestionnaire() {
-    const res = await fetch ("/questionnaires", {
-        method: "POST",
-        body: JSON.stringify({name: "Untitled Questionnaire"}),
-        headers: {'Content-Type': 'application/json'}
-    });
+    let res;
+    if (AuthUtil.isUserSignedIn()) {
+        res = await fetch ("/questionnaires", {
+            method: "POST",
+            body: JSON.stringify({
+                name: "Untitled Questionnaire",
+                token: AuthUtil.getAuthToken(),
+            }),
+            headers: {'Content-Type': 'application/json'}
+        });
+    } else {
+        res = await fetch ("/questionnaires", {
+            method: "POST",
+            body: JSON.stringify({name: "Untitled Questionnaire"}),
+            headers: {'Content-Type': 'application/json'}
+        });
+    }
 
     if (res.ok) {
         const id = await res.json();

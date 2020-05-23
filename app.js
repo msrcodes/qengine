@@ -73,8 +73,18 @@ function deleteQuestionnaire(req, res) {
     res.json(response); // return updated list of questionnaires
 }
 
-function addQuestionnaire(req, res) {
-    const response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
+async function addQuestionnaire(req, res) {
+    let response;
+    if (req.body.token != null) {
+        const tokenAuth = await auth.verifyToken(req.body.token);
+        if (!tokenAuth.valid) {
+            res.status(tokenAuth.code).send(tokenAuth.reason);
+            return;
+        }
+        response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id, tokenAuth.id);
+    } else {
+        response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
+    }
 
     if (!response.valid) {
         res.status(response.code).send(response.reason);

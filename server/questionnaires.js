@@ -43,7 +43,7 @@ function deleteQuestionnaire(id) {
     return questionnaires;  // Return the updated list of questionnaires
 }
 
-function addQuestionnaire(name, questions, id) {
+function addQuestionnaire(name, questions, id, userId) {
     // if required parameter value is not defined, return HTTP bad request error code
     if (name === undefined) {
         return {
@@ -75,6 +75,17 @@ function addQuestionnaire(name, questions, id) {
 
     // add questionnaire to storage
     questionnaires[qnrId] = qnr;
+
+    // assign to correct user
+    if (userId == null) {
+        users.public.push(qnrId);
+    } else {
+        if (users[userId] == null) {
+            users[userId] = [];
+        }
+
+        users[userId].push(qnrId);
+    }
 
     return {valid: true, id: qnrId, code: 200};
 }

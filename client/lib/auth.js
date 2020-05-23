@@ -4,8 +4,12 @@ let auth2;
 
 /* Helper functions */
 async function signOut() {
-    const auth2 = gapi.auth2.getAuthInstance();
     await auth2.signOut();
+}
+
+export function isUserSignedIn() {
+    const user = auth2.currentUser.get();
+    return user.isSignedIn();
 }
 
 export function getUserID() {
