@@ -14,15 +14,16 @@ function getQuestionnaires() {
 }
 
 function getQuestionnaireInfo(userId) {
-    let keys = users.public;
-    if (userId != null) {
-        keys = [...keys, ...users[userId]];
-    }
-
     const ret = [];
 
-    for (const key of keys) {
-        ret.push({id: key, name: questionnaires[key].name});
+    for (const key of users.public) {
+        ret.push({id: key, name: questionnaires[key].name, owner: "public"});
+    }
+
+    if (userId != null) {
+        for (const key of users[userId]) {
+            ret.push({id: key, name: questionnaires[key].name, owner: "user"});
+        }
     }
 
     return ret;

@@ -68,6 +68,13 @@ function populateTemplate(obj) {
     clone.querySelector(".edit").href = URLUtil.getURL("edit", obj.id);
     clone.querySelector(".responses").href = URLUtil.getURL("responses", obj.id);
 
+    if (obj.owner === "user") {
+        clone.querySelector("h4").textContent = "Owned by you.";
+    } else if (obj.owner === "public") {
+        clone.querySelector("h4").textContent = "A public questionnaire.";
+        clone.querySelector(".edit").remove();
+    }
+
     pageElements.questionnaireContainer.append(clone);
 }
 
