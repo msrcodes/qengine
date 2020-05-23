@@ -1,5 +1,6 @@
 'use strict';
 
+import * as AuthUtil from "./lib/auth"
 import * as URLUtil from "./lib/url"
 
 const pageElements = {};
@@ -29,6 +30,24 @@ function addEventListeners() {
     pageElements.createBtn.addEventListener('click', createQuestionnaire);
 }
 
+function toggleLoadText() {
+    const loadText = pageElements.questionnaireContainer.querySelector(".loadingText");
+    if (loadText == null) {
+        const elem = document.createElement("p");
+        elem.append(document.createTextNode("Loading, please wait..."));
+        elem.classList.add("loadingText");
+        pageElements.questionnaireContainer.append(elem);
+    } else {
+        loadText.remove();
+    }
+}
+
+function clearTemplate() {
+    while (pageElements.questionnaireContainer.hasChildNodes()) {
+        pageElements.questionnaireContainer.firstChild.remove();
+    }
+}
+
 function populateTemplate(obj) {
     const clone = pageElements.questionnaireTemplate.content.cloneNode(true);
     clone.querySelector("h3").textContent = obj.name;
@@ -40,50 +59,49 @@ function populateTemplate(obj) {
     pageElements.questionnaireContainer.append(clone);
 }
 
-function initAuth() {
-    const auth2 = gapi.auth2.init();
-
-    // if (auth2.isSignedIn.get()) {
-    //     const user = auth2.currentUser.get();
-    //     console.log(user.getId());
-    // } else {
-    //     console.log("Not signed in");
-    // }
-
-    auth2.isSignedIn.listen(initPage);
-
-    return auth2;
-}
-
-async function initPage(signedIn) {
-    let userId;
-    if (signedIn) {
-        const auth2 = gapi.auth2.init();
-        const user = auth2.currentUser.get();
-        userId = user.getId();
-    }
-
+async function getQuestionnaireInfo(userId) {
     let res;
-    if (userId != null) {
-        res = await fetch(`/questionnaireInfo/${userId}`);
-    } else {
+    if (userId == null) {
         res = await fetch("/questionnaireInfo/");
+    } else {
+        res = await fetch(`/questionnaireInfo/${userId}`);
     }
 
     if (res.ok) {
-        const json = await res.json();
-        for (const obj of json) {
+        return await res.json();
+    } else {
+        return null;
+    }
+}
+
+async function initPage(signedIn) {
+    clearTemplate();
+    toggleLoadText();
+
+    let userId;
+    if (signedIn) {
+        userId = AuthUtil.getIDToken();
+    }
+
+    const info = await getQuestionnaireInfo(userId);
+    if (info != null) {
+        for (const obj of info) {
             populateTemplate(obj);
         }
     } else {
-        // todo: proper error handling
+        const elem = document.createElement("p");
+        elem.append(document.createTextNode("An unexpected error occurred.")); // TODO: refresh?
+        pageElements.questionnaireContainer.append(elem);
     }
+
+    toggleLoadText();
 }
 
 async function onPageLoad() {
     getHandles();
     addEventListeners();
-    initAuth();
+    AuthUtil.init();
+    AuthUtil.onSignIn(initPage);
     await initPage(false);
 }
 

@@ -1,22 +1,33 @@
-async function onSignIn(googleUser) {
-    const id_token = googleUser.getAuthResponse().id_token;
+'use strict';
 
-    const res = await fetch('/auth', {
-        method: 'POST',
-        body: `idtoken=${id_token}`,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-    });
+let auth2;
 
-    if (res.ok) {
-        const json = await res.json();
-        console.log(json);
-    } else {
-        console.log("no");
-    }
-}
-
+/* Helper functions */
 async function signOut() {
     const auth2 = gapi.auth2.getAuthInstance();
     await auth2.signOut();
-    console.log('User signed out.');
+}
+
+export function getIDToken() {
+    const user = auth2.currentUser.get();
+    return user.getId();
+}
+
+/* Event Listeners */
+export function onSignIn(f) {
+    auth2.isSignedIn.listen(f);
+}
+
+/* Initialisation code */
+function initSignOut() {
+    const buttons = document.querySelectorAll(".signOut");
+
+    for (const i of buttons) {
+        i.addEventListener('click', signOut);
+    }
+}
+
+export function init() {
+    auth2 = gapi.auth2.init();
+    initSignOut();
 }
