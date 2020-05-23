@@ -258,25 +258,25 @@ async function checkAuth() {
         const res = await fetch(`/questionnaireInfo/${AuthUtil.getAuthToken()}`);
         if (res.ok) {
             const json = await res.json();
-            // // TODO: Check if the questionnaire is public (and so cannot be edited)
-            // if (json.owner === "public") {
-            //     auth = {valid: false, reason: "Public questionnaires cannot be edited."};
-            // } else {
-                // If they are signed in, check if they own this questionnaire
-                let found = false;
-                for (const obj of json) {
-                    if (obj.id === URLUtil.getQuestionnaireId()) {
-                        found = true;
-                        break;
-                    }
-                }
 
-                if (found) {
-                    auth = {valid: true};
-                } else {
-                    auth = {valid: false, reason: "User does not have access to this questionnaire."};
+            // If they are signed in, check if they own this questionnaire
+            let found = false;
+            for (const obj of json) {
+                if (obj.id === URLUtil.getQuestionnaireId()) {
+                    found = true;
+
+                    if (obj.owner === "public") {
+                        auth = {valid: false, reason: "Public questionnaires cannot be edited."};
+                    } else {
+                        auth = {valid: true};
+                    }
+                    break;
                 }
-            // }
+            }
+
+            if (!found) {
+                auth = {valid: false, reason: "User does not have access to this questionnaire."};
+            }
         } else {
             auth = {valid: false, reason: res.statusText};
         }
