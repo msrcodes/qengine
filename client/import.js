@@ -38,7 +38,38 @@ async function createFromJSON() {
 
     if (res.ok) {
         const id = await res.json();
-        window.location = URLUtil.getURL("edit", id);
+
+        const main = document.querySelector("main");
+        while (main.hasChildNodes()) {
+            main.removeChild(main.firstChild);
+        }
+
+        const p = document.createElement("p");
+        p.append(document.createTextNode("Import successful. The questionnaire has now been published."));
+        main.append(p);
+
+        const ul = document.createElement("ul");
+
+        const links = [
+            {url: "responses", text: "View Responses"},
+            {url: "respond", text: "Respond to this questionnaire"},
+            {url: "edit", text: "Edit this questionnaire"}
+        ];
+
+        for (const i of links) {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.append(document.createTextNode(i.text));
+            a.href = URLUtil.getURL(i.url, id);
+            li.append(a);
+            ul.append(li);
+        }
+
+        if (!AuthUtil.isUserSignedIn()) {
+            ul.lastChild.remove();
+        }
+
+        main.append(ul);
     } else {
         const errorText = await res.text();
 
