@@ -4,41 +4,52 @@
     <meta charset="UTF-8">
     <title>QEngine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="edit.js" type="module"></script>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <h1>QEngine - Edit</h1>
-    <label for="questionnaire-name">Questionnaire Title:</label>
-    <input id="questionnaire-name" type="text"/>
+    <div class="g-signin2"></div>
+    <a href="#" class="signOut">Sign out</a>
+    <main class="hidden">
+        <label for="questionnaire-name">Questionnaire Title:</label>
+        <input id="questionnaire-name" type="text"/>
 
-    <button id="btn-delete-questionnaire">Delete questionnaire</button>
-    <a href="#" id="responses-link">View Responses</a>
-    <div id="questions">
+        <button id="btn-delete-questionnaire">Delete questionnaire</button>
+        <a href="#" id="responses-link">View Responses</a>
+        <div id="questions">
 
-    </div>
-    <button id="add-question">Add question</button>
-    <template id="template-question">
-        <fieldset>
-            <legend><label for="text">Question title:</label><input id="text" type="text"></legend>
-            <label>
-                Question type:
-                <select id="type">
-                    <option value="text">text</option>
-                    <option value="number">number</option>
-                    <option value="single-select">single-select</option>
-                    <option value="multi-select">multi-select</option>
-                </select>
-            </label>
-            <ol id="option-container" class="hidden">
+        </div>
+        <button id="add-question">Add question</button>
+        <template id="template-question">
+            <fieldset>
+                <legend><label for="text">Question title:</label><input id="text" type="text"></legend>
+                <label>
+                    Question type:
+                    <select id="type">
+                        <option value="text">text</option>
+                        <option value="number">number</option>
+                        <option value="single-select">single-select</option>
+                        <option value="multi-select">multi-select</option>
+                    </select>
+                </label>
+                <ol id="option-container" class="hidden">
 
-            </ol>
-            <button id="delete-question">Delete Question</button>
-        </fieldset>
-    </template>
-    <button id="update">Save Changes</button>
-    <section>
-        <h2>Share this questionnaire</h2>
-        <span>This questionnaire is available here: <a href="" id="questionnaire-link"></a> <button id="copy-respond-btn">Copy to clipboard</button></span>
-    </section>
+                </ol>
+                <button id="delete-question">Delete Question</button>
+            </fieldset>
+        </template>
+        <button id="update">Save Changes</button>
+        <section>
+            <h2>Share this questionnaire</h2>
+            <span>This questionnaire is available here: <a href="" id="questionnaire-link"></a> <button id="copy-respond-btn">Copy to clipboard</button></span>
+        </section>
+    </main>
 </body>
 </html>

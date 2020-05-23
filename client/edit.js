@@ -1,6 +1,7 @@
 'use strict';
 
-import * as URLUtil from "./lib/url"
+import * as AuthUtil from "./lib/auth";
+import * as URLUtil from "./lib/url";
 
 const pageElements = {};
 
@@ -198,6 +199,13 @@ function displayQuestionnaireLink() {
 
 async function displayQuestionnaire() {
     const id = URLUtil.getQuestionnaireId();
+
+    document.querySelector("main").classList.remove("hidden");
+    const error = document.querySelector("h2.error");
+    if (error != null) {
+        error.remove();
+    }
+
     // If null is passed as a parameter, assume there are no questionnaires
     if (id === null) {
         pageElements.questionnaireName.textContent = "No questionnaires to display.";
@@ -242,15 +250,68 @@ function getHandles() {
     pageElements.addQuestionBtn = document.querySelector("#add-question");
 }
 
-async function initPage() {
+async function checkAuth() {
+    let auth = {};
+
+    // Check if user is signed in
+    if (AuthUtil.isUserSignedIn()) {
+        const res = await fetch(`/questionnaireInfo/${AuthUtil.getAuthToken()}`);
+        if (res.ok) {
+            const json = await res.json();
+            // // TODO: Check if the questionnaire is public (and so cannot be edited)
+            // if (json.owner === "public") {
+            //     auth = {valid: false, reason: "Public questionnaires cannot be edited."};
+            // } else {
+                // If they are signed in, check if they own this questionnaire
+                let found = false;
+                for (const obj of json) {
+                    if (obj.id === URLUtil.getQuestionnaireId()) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    auth = {valid: true};
+                } else {
+                    auth = {valid: false, reason: "User does not have access to this questionnaire."};
+                }
+            // }
+        } else {
+            auth = {valid: false, reason: res.statusText};
+        }
+    } else {
+        auth = {valid: false, reason: "User is not logged in."};
+    }
+    
+    if (!auth.valid) {
+        document.querySelector("main").classList.add("hidden");
+        const elem = document.createElement("h2");
+        elem.classList.add("error");
+        elem.append(document.createTextNode(auth.reason));
+        document.querySelector("body").append(elem);
+        return false;
+    }
+
+    return true;
+}
+
+async function authedLoad() {
+    if (!await checkAuth()) {
+        return;
+    }
+
     await displayQuestionnaire();
     displayQuestionnaireLink();
 }
 
 async function onPageLoad() {
+    AuthUtil.init();
+
     getHandles();
     addEventListeners();
-    await initPage();
+
+    AuthUtil.onSignIn(authedLoad);
 }
 
 window.addEventListener('load', onPageLoad);
