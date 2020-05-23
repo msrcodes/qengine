@@ -253,6 +253,21 @@ function getHandles() {
 async function checkAuth() {
     let auth = {};
 
+    // Bypass auth if it's a public questionnaire on first edit
+    const res = await fetch("/questionnaireInfo");
+    if (res.ok) {
+        const json = await res.json();
+        for (const obj of json) {
+            if (obj.id === URLUtil.getQuestionnaireId() && obj.owner === "public") {
+                if (!obj.lock) {
+                    return true;
+                }
+            }
+        }
+    } else {
+        console.error("failed to fetch");
+    }
+
     // Check if user is signed in
     if (AuthUtil.isUserSignedIn()) {
         const res = await fetch(`/questionnaireInfo/${AuthUtil.getAuthToken()}`);
@@ -312,6 +327,7 @@ async function onPageLoad() {
     addEventListeners();
 
     AuthUtil.onSignIn(authedLoad);
+    await authedLoad();
 }
 
 window.addEventListener('load', onPageLoad);

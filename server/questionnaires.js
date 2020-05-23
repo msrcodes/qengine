@@ -17,7 +17,12 @@ function getQuestionnaireInfo(userId) {
     const ret = [];
 
     for (const key of users.public) {
-        ret.push({id: key, name: questionnaires[key].name, owner: "public"});
+        const info = {id: key, name: questionnaires[key].name, owner: "public"};
+
+        // Lock is true if the questionnaire is public and has not been edited (i.e. there are no questions)
+        info.lock = questionnaires[key].questions.length > 0;
+
+        ret.push(info);
     }
 
     if (userId != null) {
