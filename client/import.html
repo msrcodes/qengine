@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <title>QEngine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="import.js" type="module"></script>
 </head>
 <body>
 <h1>QEngine - Import</h1>
+<div class="g-signin2"></div>
+<a href="#" class="signOut">Sign out</a>
 <p id="error-text"></p>
 <label for="json-input">Input JSON:</label>
 <textarea name="json-input" id="json-input" cols="75" rows="30"></textarea>
