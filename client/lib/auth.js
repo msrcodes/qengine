@@ -8,9 +8,14 @@ async function signOut() {
     await auth2.signOut();
 }
 
-export function getIDToken() {
+export function getUserID() {
     const user = auth2.currentUser.get();
     return user.getId();
+}
+
+export function getAuthToken() {
+    const user = auth2.currentUser.get();
+    return user.getAuthResponse().id_token;
 }
 
 /* Event Listeners */

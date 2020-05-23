@@ -3,7 +3,8 @@
 const uuid = require('uuid-random');
 
 const users = {
-    "106927976972072440406": ["example-questionnaire", "second-questionnaire"]
+    "public": ["example-questionnaire"],
+    "106927976972072440406": ["second-questionnaire"]
 };
 const questionnaires = require("./test-questionnaires");
 const validateLib = require("./validate");
@@ -13,11 +14,14 @@ function getQuestionnaires() {
 }
 
 function getQuestionnaireInfo(userId) {
-    console.log(userId);
+    let keys = users.public;
+    if (userId != null) {
+        keys = [...keys, ...users[userId]];
+    }
 
     const ret = [];
 
-    for (const key of Object.keys(questionnaires)) {
+    for (const key of keys) {
         ret.push({id: key, name: questionnaires[key].name});
     }
 

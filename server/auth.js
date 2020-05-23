@@ -13,7 +13,7 @@ async function verifyToken(token) {
         const id = payload.sub;
         return {valid: true, code: 200, id};
     } catch (e) {
-        return {valid: false, code: 400, reason: e};
+        return {valid: false, code: 401, reason: e};
     }
 }
 

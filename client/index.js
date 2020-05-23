@@ -59,12 +59,12 @@ function populateTemplate(obj) {
     pageElements.questionnaireContainer.append(clone);
 }
 
-async function getQuestionnaireInfo(userId) {
+async function getQuestionnaireInfo(authToken) {
     let res;
-    if (userId == null) {
+    if (authToken == null) {
         res = await fetch("/questionnaireInfo/");
     } else {
-        res = await fetch(`/questionnaireInfo/${userId}`);
+        res = await fetch(`/questionnaireInfo/${authToken}`);
     }
 
     if (res.ok) {
@@ -78,12 +78,12 @@ async function initPage(signedIn) {
     clearTemplate();
     toggleLoadText();
 
-    let userId;
+    let authToken;
     if (signedIn) {
-        userId = AuthUtil.getIDToken();
+        authToken = AuthUtil.getAuthToken();
     }
 
-    const info = await getQuestionnaireInfo(userId);
+    const info = await getQuestionnaireInfo(authToken);
     if (info != null) {
         for (const obj of info) {
             populateTemplate(obj);

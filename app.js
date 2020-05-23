@@ -9,17 +9,6 @@ const app = express();
 
 app.use(express.static('client', {extensions: ['html', 'js']}));
 
-async function verifyToken(req, res) {
-    const response = await auth.verifyToken(req.body.idtoken);
-
-    if (!response.valid) {
-        res.status(response.code).send(response.reason);
-        return;
-    }
-
-    res.json(response);
-}
-
 function addResponse(req, res) {
     const response = resp.addResponse(req.params.id, req.body);
 
@@ -46,10 +35,17 @@ function getQuestionnaires(req, res) {
     res.json(qnr.getQuestionnaires());
 }
 
-function getQuestionnaireInfo(req, res) {
-    const id = req.params.id;
-    if (id != null) {
-        res.json(qnr.getQuestionnaireIDs(id));
+async function getQuestionnaireInfo(req, res) {
+    const token = req.params.token;
+
+    if (token != null) {
+        const tokenAuth = await auth.verifyToken(token);
+        if (!tokenAuth.valid) {
+            res.status(tokenAuth.code).send(tokenAuth.reason);
+            return;
+        }
+
+        res.json(qnr.getQuestionnaireIDs(tokenAuth.id));
     } else {
         res.json(qnr.getQuestionnaireIDs());
     }
@@ -110,8 +106,6 @@ function addQuestion(req, res) {
     res.json(response.questionnaire); // return updated questionnaire
 }
 
-app.post('/auth', express.urlencoded({extended: true}), verifyToken);
-
 app.post('/responses/:id', express.json(), addResponse);
 
 app.get('/responses/:id', getResponses);
@@ -128,7 +122,7 @@ app.get('/questionnaires/:id', getQuestionnaire);
 
 app.get('/questionnaireInfo', getQuestionnaireInfo);
 
-app.get('/questionnaireInfo/:id', getQuestionnaireInfo);
+app.get('/questionnaireInfo/:token', getQuestionnaireInfo);
 
 app.get('/questionnaires', getQuestionnaires);
 
