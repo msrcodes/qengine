@@ -20,30 +20,43 @@
     <main class="hidden">
         <label for="questionnaire-name">Questionnaire Title:</label>
         <input id="questionnaire-name" type="text"/>
-
         <button id="btn-delete-questionnaire">Delete questionnaire</button>
-        <a href="#" id="responses-link">View Responses</a>
+        <a href="" id="responses-link">View Responses</a>
+        <p id="error"></p>
         <div id="questions">
 
         </div>
         <button id="add-question">Add question</button>
         <template id="template-question">
             <fieldset>
-                <legend><label for="text">Question title:</label><input id="text" type="text"></legend>
+                <legend>
+                    <label>Question title:
+                        <input type="text">
+                    </label>
+                </legend>
                 <label>
                     Question type:
-                    <select id="type">
+                    <select>
                         <option value="text">text</option>
                         <option value="number">number</option>
                         <option value="single-select">single-select</option>
                         <option value="multi-select">multi-select</option>
                     </select>
                 </label>
-                <ol id="option-container" class="hidden">
+                <ol class="hidden">
 
                 </ol>
-                <button id="delete-question">Delete Question</button>
+                <button class="add-option hidden">Add Option</button>
+                <button class="delete">Delete Question</button>
             </fieldset>
+        </template>
+        <template id="template-option">
+            <li>
+                <label>
+                    <input type="text">
+                </label>
+                <button>Remove Option</button>
+            </li>
         </template>
         <button id="update">Save Changes</button>
         <section>
