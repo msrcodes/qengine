@@ -1,5 +1,5 @@
 {
-  "example-questionnaire": [
+  "738c592f-7ea6-4452-9a7a-c07d0a5d5285": [
     {
       "name": "John",
       "quest": "World Domination",
@@ -9,7 +9,7 @@
       "langs": ["Java", "Python"]
     }
   ],
-  "second-questionnaire": [
+  "4f4424e9-a151-49e6-8d67-e467d7776290": [
     {
       "name": "NotJohn",
       "quest": "Not World Domination",

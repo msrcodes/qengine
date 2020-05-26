@@ -31,13 +31,21 @@ function getResponses(req, res) {
     res.json(responses);
 }
 
-function getQuestionnaires(req, res) {
-    res.json(qnr.getQuestionnaires());
+async function getQuestionnaires(req, res) {
+    const response = await qnr.getQuestionnaires();
+
+    if (response.code === 400) {
+        res.status(400).send(response.reason);
+        return;
+    }
+
+    res.json(response);
 }
 
 async function getQuestionnaireInfo(req, res) {
     const token = req.params.token;
 
+    let response;
     if (token != null) {
         const tokenAuth = await auth.verifyToken(token);
         if (!tokenAuth.valid) {
@@ -45,28 +53,40 @@ async function getQuestionnaireInfo(req, res) {
             return;
         }
 
-        res.json(qnr.getQuestionnaireIDs(tokenAuth.id));
+        response = await qnr.getQuestionnaireInfo(tokenAuth.id);
     } else {
-        res.json(qnr.getQuestionnaireIDs());
+        response = await qnr.getQuestionnaireInfo();
     }
+
+    if (response.code === 400) {
+        res.status(400).send(response.reason);
+        return;
+    }
+
+    res.json(response);
 }
 
-function getQuestionnaire(req, res) {
-    const questionnaire = qnr.getQuestionnaire(req.params.id);
+async function getQuestionnaire(req, res) {
+    const response = await qnr.getQuestionnaire(req.params.id);
 
-    if (questionnaire === undefined) {
+    if (response === undefined) {
         res.status(404).send('No match for that ID.');
         return;
     }
 
-    res.json(questionnaire);
+    if (response.code === 400) {
+        res.status(400).send(response.reason);
+        return;
+    }
+
+    res.json(response);
 }
 
-function deleteQuestionnaire(req, res) {
-    const response = qnr.deleteQuestionnaire(req.params.id);
+async function deleteQuestionnaire(req, res) {
+    const response = await qnr.deleteQuestionnaire(req.params.id);
 
-    if (response === undefined) {
-        res.status(404).send('No match for that ID.');
+    if (response.code === 400 || response.code === 404) {
+        res.status(response.code).send(response.reason);
         return;
     }
 
@@ -81,9 +101,9 @@ async function addQuestionnaire(req, res) {
             res.status(tokenAuth.code).send(tokenAuth.reason);
             return;
         }
-        response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id, tokenAuth.id);
+        response = await qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id, tokenAuth.id);
     } else {
-        response = qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
+        response = await qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
     }
 
     if (!response.valid) {
@@ -94,8 +114,8 @@ async function addQuestionnaire(req, res) {
     res.json(response.id);
 }
 
-function updateQuestionnaire(req, res) {
-    const response = qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
+async function updateQuestionnaire(req, res) {
+    const response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
 
     if (!response.valid) {
         res.status(response.code).send(response.reason);

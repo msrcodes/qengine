@@ -1,55 +1,90 @@
 'use strict';
 
+const db = require('./database');
 const uuid = require('uuid-random');
-
-const users = {
-    "public": ["example-questionnaire"],
-    "106927976972072440406": ["second-questionnaire"]
-};
-const questionnaires = require("./test-questionnaires");
 const validateLib = require("./validate");
 
-function getQuestionnaires() {
-    return questionnaires;
-}
+async function getQuestionnaires() {
+    try {
+        const con = await db.dbConn;
+        const qnrs = await con.all('SELECT * FROM Questionnaires');
 
-function getQuestionnaireInfo(userId) {
-    const ret = [];
+        const ret = {};
 
-    for (const key of users.public) {
-        const info = {id: key, name: questionnaires[key].name, owner: "public"};
-
-        // Lock is true if the questionnaire is public and has not been edited (i.e. there are no questions)
-        info.lock = questionnaires[key].questions.length > 0;
-
-        ret.push(info);
-    }
-
-    if (userId != null) {
-        for (const key of users[userId]) {
-            ret.push({id: key, name: questionnaires[key].name, owner: "user"});
+        for (const qnr of qnrs) {
+            ret[qnr.id] = {
+                name: qnr['name'],
+                questions: JSON.parse(qnr['questions'])
+            };
         }
+
+        return ret;
+    } catch (e) {
+        return {code: 400, error: e};
     }
-
-    return ret;
 }
 
-function getQuestionnaire(id) {
-    return questionnaires[id];
+async function getQuestionnaireInfo(userId) {
+    try {
+        const con = await db.dbConn;
+        const info = await con.all(`
+        SELECT id, name, questions, user_id FROM Questionnaires 
+        JOIN UsersQuestionnaires ON Questionnaires.id = UsersQuestionnaires.questionnaire_id 
+        WHERE UsersQuestionnaires.user_id = '_______________PUBLIC' OR UsersQuestionnaires.user_id = ?`,
+            userId);
+
+        for (const qnr of info) {
+            qnr.questions = JSON.parse(qnr.questions);
+
+            if (qnr.user_id === '_______________PUBLIC') {
+                qnr.owner = 'public';
+
+                if (qnr.questions.length > 0) {
+                    qnr.lock = true;
+                }
+            } else {
+                qnr.owner = 'user';
+            }
+
+            delete qnr.user_id;
+            delete qnr.questions;
+        }
+
+        return info;
+    } catch (e) {
+        return {code: 400, error: e};
+    }
 }
 
-function deleteQuestionnaire(id) {
-    const questionnaire = getQuestionnaire(id); // Get questionnaire from memory
+async function getQuestionnaire(id) {
+    try {
+        const con = await db.dbConn;
+        const qnr = await con.get(`SELECT name, questions FROM Questionnaires WHERE id = ?`, id);
+        qnr.questions = JSON.parse(qnr.questions);
 
-    if (questionnaire === undefined)    // If no questionnaire exists for that ID, short
-        return undefined;
-
-    delete questionnaires[id];  // If a questionnaire exists for that ID, delete it
-
-    return questionnaires;  // Return the updated list of questionnaires
+        return qnr;
+    } catch (e) {
+        return {code: 400, error: e};
+    }
 }
 
-function addQuestionnaire(name, questions, id, userId) {
+async function deleteQuestionnaire(id) {
+    try {
+        const questionnaire = await getQuestionnaire(id); // Get questionnaire from memory
+
+        if (questionnaire === undefined)    // If no questionnaire exists for that ID, short
+            return {code: 404, error: 'No questionnaire exists for that ID'};
+
+        const con = await db.dbConn;
+        con.run('DELETE FROM Questionnaires WHERE id = ?', id);
+
+        return getQuestionnaires();  // Return the updated list of questionnaires
+    } catch (e) {
+        return {code: 400, error: e};
+    }
+}
+
+async function addQuestionnaire(name, questions, id, userId) {
     // if required parameter value is not defined, return HTTP bad request error code
     if (name === undefined) {
         return {
@@ -60,7 +95,7 @@ function addQuestionnaire(name, questions, id, userId) {
     }
 
     // if an id is defined, and a questionnaire already exists with that id, return HTTP bad request error code
-    if (id !== undefined && getQuestionnaire(id) !== undefined) {
+    if (id !== undefined && await getQuestionnaire(id) !== undefined) {
         return {
             valid: false,
             reason: `Questionnaire already exists with id '${id}'`,
@@ -80,88 +115,96 @@ function addQuestionnaire(name, questions, id, userId) {
     }
 
     // add questionnaire to storage
-    questionnaires[qnrId] = qnr;
+    try {
+        const con = await db.dbConn;
+        con.run('INSERT INTO Questionnaires (id, name, questions) VALUES (?, ?, ?)', qnrId, name, JSON.stringify(qnrQs));
 
-    // assign to correct user
-    if (userId == null) {
-        users.public.push(qnrId);
-    } else {
-        if (users[userId] == null) {
-            users[userId] = [];
+        // assign to correct user
+        if (userId == null) {
+            userId = '_______________PUBLIC';
         }
 
-        users[userId].push(qnrId);
+        // if user does not exist, register them
+        if (con.get('SELECT * FROM Users WHERE Users.id = ?', userId) == null) {
+            con.run('INSERT INTO Users (id) VALUES (?)', userId);
+        }
+
+        // add this questionnaire to the correct user
+        con.run('INSERT INTO UsersQuestionnaires (user_id, questionnaire_id) VALUES (?, ?)', userId, qnrId);
+    } catch (e) {
+        return {valid: false, code: 400, reason: e};
     }
 
     return {valid: true, id: qnrId, code: 200};
 }
 
-function updateQuestionnaire(name, questions, id) {
-    const questionnaire = {
+async function updateQuestionnaire(name, questions, id) {
+    const qnr = {
         name,
         questions
     };
 
-    // if no matching questionnaire is found, return HTTP Not Found code
-    if (getQuestionnaire(id) === undefined)
-        return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
+    try {
+        // if no matching questionnaire is found, return HTTP Not Found code
+        if (await getQuestionnaire(id) === undefined)
+            return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
 
-    for (const question of questionnaire.questions) {
-        if (question.id === "undefined" || question.id == null) {
-            question.id = uuid();
+        for (const question of qnr.questions) {
+            if (question.id === "undefined" || question.id == null) {
+                question.id = uuid();
+            }
         }
+
+        const res = validateLib.validateQuestionnaire(qnr);
+
+        if (!res.valid) {
+            return res;
+        }
+
+        // update questionnaire
+        const con = await db.dbConn;
+        con.run('UPDATE Questionnaires SET name = ?, questions = ? WHERE id = ?', name, JSON.stringify(qnr.questions), id);
+        return {valid: true, code: 200};
+    } catch (e) {
+        return {valid: false, code: 400, reason: e};
     }
-
-    const res = validateLib.validateQuestionnaire(questionnaire);
-
-    if (!res.valid) {
-        return res;
-    }
-
-    // update questionnaire
-    questionnaires[id] = questionnaire;
-
-    return {valid: true, code: 200};
 }
 
-/**
- * Used to add a question to a specific questionnaire
- * @param questionnaireId The id of the questionnaire to add a question to
- * @param questionText The text content of the question
- * @param questionType The type of the question
- * @param questionOptions The options associated with that question
- * @param questionId Optional, defines the id of the question
- * @returns {Object | undefined} A JS object, the updated questionnaire
- */
-function addQuestion(questionnaireId, questionText, questionType, questionOptions, questionId) {
-    const questionnaire = getQuestionnaire(questionnaireId);
+async function addQuestion(questionnaireId, text, type, options, questionId) {
+    try {
+        const qnr = await getQuestionnaire(questionnaireId);
 
-    const qId = questionId === undefined ? uuid() : questionId;
+        const qId = questionId === undefined ? uuid() : questionId;
 
-    if (questionnaire === undefined) {
-        return {valid: false, reason: `No questionnaire could be found with id '${questionnaireId}'`, code: 404};
+        if (qnr === undefined) {
+            return {valid: false, reason: `No questionnaire could be found with id '${questionnaireId}'`, code: 404};
+        }
+
+        const question = {
+            id: qId,
+            text: text,
+            type: type,
+            options: options
+        };
+
+        const res = validateLib.validateQuestion(question);
+        if (!res.valid) {
+            return res;
+        }
+
+        qnr.questions = [...qnr.questions, question];
+        const con = await db.dbConn;
+        con.run('UPDATE Questionnaires SET questions = ? WHERE id = ?', JSON.stringify(qnr.questions), questionnaireId);
+
+        return {valid: true, questionnaire: qnr, code: 200};
+    } catch (e) {
+        return {valid: false, code: 400, reason: e};
     }
-
-    const question = {
-        id: qId,
-        text: questionText,
-        type: questionType,
-        options: questionOptions
-    };
-
-    const res = validateLib.validateQuestion(question);
-    if (!res.valid) {
-        return res;
-    }
-
-    questionnaire.questions = [...questionnaire.questions, question];
-
-    return {valid: true, questionnaire, code: 200};
 }
 
 module.exports = {
     getQuestionnaires,
-    getQuestionnaireIDs: getQuestionnaireInfo,
+    getQuestionnaireInfo,
     getQuestionnaire,
     deleteQuestionnaire,
     updateQuestionnaire,
