@@ -9,8 +9,8 @@ const app = express();
 
 app.use(express.static('client', {extensions: ['html', 'js']}));
 
-function addResponse(req, res) {
-    const response = resp.addResponse(req.params.id, req.body);
+async function addResponse(req, res) {
+    const response = await resp.addResponse(req.params.id, req.body);
 
     if (!response.valid) {
         res.status(response.code).send(response.reason);
@@ -20,8 +20,8 @@ function addResponse(req, res) {
     res.json(response);
 }
 
-function getResponses(req, res) {
-    const responses = resp.getResponses(req.params.id);
+async function getResponses(req, res) {
+    const responses = await resp.getResponses(req.params.id);
 
     if (responses === undefined) {
         res.status(404).send('No match for that ID.');

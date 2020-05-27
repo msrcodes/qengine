@@ -113,7 +113,7 @@ function addResponse(response, i) {
                     updateSelectCount(li, i);
                 }
             } else {
-                const li = ul.querySelector(`[data-option~="${response[key]}"]`);
+                const li = ul.querySelector(`[data-option~="${ans}"]`);
                 updateSelectCount(li, i)
             }
         } else {

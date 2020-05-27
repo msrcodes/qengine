@@ -1,11 +1,11 @@
 'use strict';
 
-const responses = require("./test-responses");
+const db = require('./database');
 const qnr = require("./questionnaires");
 const validateLib = require("./validate");
 
-function validate(questionnaireId, response) {
-    const questionnaire = qnr.getQuestionnaire(questionnaireId);
+async function validate(questionnaireId, response) {
+    const questionnaire = await qnr.getQuestionnaire(questionnaireId);
 
     const res = validateLib.validateQNRResponse(response, questionnaire);
     if (!res.valid) {
@@ -15,24 +15,27 @@ function validate(questionnaireId, response) {
     return {valid: true};
 }
 
-function addResponse(questionnaireId, response) {
-    const res = validate(questionnaireId, response);
+async function addResponse(questionnaireId, response) {
+    const res = await validate(questionnaireId, response);
     if (!res.valid) {
         return res;
     }
 
-    // Check if a response has been given for this question before
-    if (responses[questionnaireId] == null) {
-        responses[questionnaireId] = []; // If a response has not been given, create empty responses array
-    }
-
-    responses[questionnaireId] = [response, ...responses[questionnaireId]];
+    const con = await db.dbConn;
+    await con.run('INSERT INTO Responses (questionnaire_id, response) VALUES (?, ?)', questionnaireId, JSON.stringify(response));
 
     return {valid: true};
 }
 
-function getResponses(id) {
-    return responses[id];
+async function getResponses(id) {
+    const con = await db.dbConn;
+    const responses = await con.all('SELECT response FROM Responses WHERE questionnaire_id = ?', id);
+
+    for (let i = 0; i < responses.length; i++) {
+        responses[i] = JSON.parse(responses[i].response);
+    }
+
+    return responses;
 }
 
 module.exports = {
