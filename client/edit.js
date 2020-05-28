@@ -62,7 +62,14 @@ async function updateQuestionnaire() {
 }
 
 async function deleteQuestionnaire() {
-    const response = await fetch(`questionnaires/${URLUtil.getQuestionnaireId()}`, {
+    let responseStr;
+    if (AuthUtil.isUserSignedIn()) {
+        responseStr = `questionnaires/${URLUtil.getQuestionnaireId()}/${AuthUtil.getAuthToken()}`;
+    } else {
+        responseStr = `questionnaires/${URLUtil.getQuestionnaireId()}`;
+    }
+
+    const response = await fetch(responseStr, {
         method: 'DELETE',
     });
 

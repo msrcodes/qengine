@@ -83,14 +83,24 @@ async function getQuestionnaire(req, res) {
 }
 
 async function deleteQuestionnaire(req, res) {
-    const response = await qnr.deleteQuestionnaire(req.params.id);
-
-    if (response.code === 400 || response.code === 404) {
-        res.status(response.code).send(response.reason);
-        return;
+    const token = req.params.token;
+    let response;
+    if (token != null) {
+        const tokenAuth = await auth.verifyToken(token);
+        if (!tokenAuth.valid) {
+            res.status(tokenAuth.code).send(tokenAuth.reason);
+            return;
+        }
+        response = await qnr.deleteQuestionnaire(req.params.id, tokenAuth.id);
+    } else {
+        response = await qnr.deleteQuestionnaire(req.params.id);
     }
 
-    res.json(response); // return updated list of questionnaires
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
+    } else {
+        res.status(200).send("OK");
+    }
 }
 
 async function addQuestionnaire(req, res) {
@@ -161,6 +171,8 @@ app.put('/questionnaires/:id/:token', express.json(), updateQuestionnaire);
 app.post('/questionnaires', express.json(), addQuestionnaire);
 
 app.delete('/questionnaires/:id', deleteQuestionnaire);
+
+app.delete('/questionnaires/:id/:token', deleteQuestionnaire);
 
 app.get('/questionnaires/:id', getQuestionnaire);
 

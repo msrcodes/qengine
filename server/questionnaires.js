@@ -68,19 +68,48 @@ async function getQuestionnaire(id) {
     }
 }
 
-async function deleteQuestionnaire(id) {
+async function checkUserAccess(qnrId, userId) {
+    const info = await getQuestionnaireInfo(userId);
+    let ret;
+    for (const i of info) {
+        if (i.id === qnrId) {
+            ret = i;
+            break;
+        }
+    }
+
+    if (ret != null) {
+        if (ret.owner === "public" && ret.lock === true) {
+            return {valid: false, reason: "User cannot update this questionnaire", code: 401};
+        }
+    } else {
+        return {valid: false, reason: `Could not find questionnaire for user ${userId} with id ${qnrId}`, code: 404};
+    }
+
+    return {valid: true};
+}
+
+async function deleteQuestionnaire(qnrId, userId) {
     try {
-        const questionnaire = await getQuestionnaire(id); // Get questionnaire from memory
+        const questionnaire = await getQuestionnaire(qnrId); // Get questionnaire from memory
 
         if (questionnaire === undefined)    // If no questionnaire exists for that ID, short
-            return {code: 404, error: 'No questionnaire exists for that ID'};
+            return {valid: false, code: 404, error: 'No questionnaire exists for that ID'};
+
+        // check that the user has permissions for this questionnaire
+        const access = await checkUserAccess(qnrId, userId);
+        if (!access.valid) {
+            return access;
+        }
 
         const con = await db.dbConn;
-        con.run('DELETE FROM Questionnaires WHERE id = ?', id);
+        con.run('DELETE FROM Questionnaires WHERE id = ?', qnrId);
+        con.run('DELETE FROM UsersQuestionnaires WHERE questionnaire_id = ?', qnrId);
 
-        return getQuestionnaires();  // Return the updated list of questionnaires
+        return {valid: true};  // Return the updated list of questionnaires
     } catch (e) {
-        return {code: 400, error: e};
+        console.error(e);
+        return {valid: false, code: 400, error: e};
     }
 }
 
@@ -138,7 +167,7 @@ async function addQuestionnaire(name, questions, id, userId) {
     return {valid: true, id: qnrId, code: 200};
 }
 
-async function updateQuestionnaire(name, questions, id, userId) {
+async function updateQuestionnaire(name, questions, qnrId, userId) {
     const qnr = {
         name,
         questions
@@ -146,23 +175,13 @@ async function updateQuestionnaire(name, questions, id, userId) {
 
     try {
         // if no matching questionnaire is found, return HTTP Not Found code
-        if (await getQuestionnaire(id) === undefined)
-            return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
+        if (await getQuestionnaire(qnrId) === undefined)
+            return {valid: false, reason: `No questionnaire could be found with id '${qnrId}'`, code: 404};
 
         // check that the user has permissions for this questionnaire
-        const info = await getQuestionnaireInfo(userId);
-        let flag = false;
-        let ret;
-        for (const i of info) {
-            if (i.id === id) {
-                ret = i;
-                flag = true;
-                break;
-            }
-        }
-
-        if (ret.owner === "public" && ret.lock === true) {
-            return {valid: false, reason: "User cannot update this questionnaire", code: 401};
+        const access = await checkUserAccess(qnrId, userId);
+        if (!access.valid) {
+            return access;
         }
 
         // Assign UUIDs to questions without ids
@@ -180,7 +199,7 @@ async function updateQuestionnaire(name, questions, id, userId) {
 
         // update questionnaire
         const con = await db.dbConn;
-        con.run('UPDATE Questionnaires SET name = ?, questions = ? WHERE id = ?', name, JSON.stringify(qnr.questions), id);
+        con.run('UPDATE Questionnaires SET name = ?, questions = ? WHERE id = ?', name, JSON.stringify(qnr.questions), qnrId);
         return {valid: true, code: 200};
     } catch (e) {
         return {valid: false, code: 400, reason: e};
