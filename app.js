@@ -147,22 +147,9 @@ async function updateQuestionnaire(req, res) {
     res.json(response.code);
 }
 
-function addQuestion(req, res) {
-    const response = qnr.addQuestion(req.params.id, req.body.text, req.body.type, req.body.options);
-
-    if (!response.valid) {
-        res.status(response.code).send(response.reason);
-        return;
-    }
-
-    res.json(response.questionnaire); // return updated questionnaire
-}
-
 app.post('/responses/:id', express.json(), addResponse);
 
 app.get('/responses/:id', getResponses);
-
-app.post('/questions/:id', express.json(), addQuestion);
 
 app.put('/questionnaires/:id', express.json(), updateQuestionnaire);
 

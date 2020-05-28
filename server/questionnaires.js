@@ -206,44 +206,11 @@ async function updateQuestionnaire(name, questions, qnrId, userId) {
     }
 }
 
-async function addQuestion(questionnaireId, text, type, options, questionId) {
-    try {
-        const qnr = await getQuestionnaire(questionnaireId);
-
-        const qId = questionId === undefined ? uuid() : questionId;
-
-        if (qnr === undefined) {
-            return {valid: false, reason: `No questionnaire could be found with id '${questionnaireId}'`, code: 404};
-        }
-
-        const question = {
-            id: qId,
-            text: text,
-            type: type,
-            options: options
-        };
-
-        const res = validateLib.validateQuestion(question);
-        if (!res.valid) {
-            return res;
-        }
-
-        qnr.questions = [...qnr.questions, question];
-        const con = await db.dbConn;
-        con.run('UPDATE Questionnaires SET questions = ? WHERE id = ?', JSON.stringify(qnr.questions), questionnaireId);
-
-        return {valid: true, questionnaire: qnr, code: 200};
-    } catch (e) {
-        return {valid: false, code: 400, reason: e};
-    }
-}
-
 module.exports = {
     getQuestionnaires,
     getQuestionnaireInfo,
     getQuestionnaire,
     deleteQuestionnaire,
     updateQuestionnaire,
-    addQuestionnaire,
-    addQuestion
+    addQuestionnaire
 };
