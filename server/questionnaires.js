@@ -138,7 +138,7 @@ async function addQuestionnaire(name, questions, id, userId) {
     return {valid: true, id: qnrId, code: 200};
 }
 
-async function updateQuestionnaire(name, questions, id) {
+async function updateQuestionnaire(name, questions, id, userId) {
     const qnr = {
         name,
         questions
@@ -149,14 +149,31 @@ async function updateQuestionnaire(name, questions, id) {
         if (await getQuestionnaire(id) === undefined)
             return {valid: false, reason: `No questionnaire could be found with id '${id}'`, code: 404};
 
+        // check that the user has permissions for this questionnaire
+        const info = await getQuestionnaireInfo(userId);
+        let flag = false;
+        let ret;
+        for (const i of info) {
+            if (i.id === id) {
+                ret = i;
+                flag = true;
+                break;
+            }
+        }
+
+        if (ret.owner === "public" && ret.lock === true) {
+            return {valid: false, reason: "User cannot update this questionnaire", code: 401};
+        }
+
+        // Assign UUIDs to questions without ids
         for (const question of qnr.questions) {
             if (question.id === "undefined" || question.id == null) {
                 question.id = uuid();
             }
         }
 
+        // Check questionnaire is valid
         const res = validateLib.validateQuestionnaire(qnr);
-
         if (!res.valid) {
             return res;
         }

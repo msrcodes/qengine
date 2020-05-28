@@ -40,8 +40,15 @@ function getFormData() {
     return data;
 }
 
-async function saveQuestionnaire() {
-    const response = await fetch(`questionnaires/${URLUtil.getQuestionnaireId()}`, {
+async function updateQuestionnaire() {
+    let responseStr;
+    if (AuthUtil.isUserSignedIn()) {
+        responseStr = `questionnaires/${URLUtil.getQuestionnaireId()}/${AuthUtil.getAuthToken()}`;
+    } else {
+        responseStr = `questionnaires/${URLUtil.getQuestionnaireId()}`;
+    }
+
+    const response = await fetch(responseStr, {
         method: 'PUT',
         body: JSON.stringify(getFormData()),
         headers: {'Content-Type': 'application/json'}
@@ -181,7 +188,7 @@ function addEventListeners() {
     pageElements.addQuestion.addEventListener("click", () => displayQuestion());
     pageElements.copy.addEventListener('click', e => copyToClipboard(e));
     pageElements.delete.addEventListener('click', deleteQuestionnaire);
-    pageElements.save.addEventListener('click', saveQuestionnaire);
+    pageElements.save.addEventListener('click', updateQuestionnaire);
 }
 
 function getHandles() {

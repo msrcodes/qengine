@@ -115,7 +115,19 @@ async function addQuestionnaire(req, res) {
 }
 
 async function updateQuestionnaire(req, res) {
-    const response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
+    const token = req.params.token;
+    let response;
+    if (token != null) {
+        const tokenAuth = await auth.verifyToken(token);
+        if (!tokenAuth.valid) {
+            res.status(tokenAuth.code).send(tokenAuth.reason);
+            return;
+        }
+
+        response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id, tokenAuth.id);
+    } else {
+        response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
+    }
 
     if (!response.valid) {
         res.status(response.code).send(response.reason);
@@ -143,6 +155,8 @@ app.get('/responses/:id', getResponses);
 app.post('/questions/:id', express.json(), addQuestion);
 
 app.put('/questionnaires/:id', express.json(), updateQuestionnaire);
+
+app.put('/questionnaires/:id/:token', express.json(), updateQuestionnaire);
 
 app.post('/questionnaires', express.json(), addQuestionnaire);
 
