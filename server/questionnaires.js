@@ -68,7 +68,7 @@ async function getQuestionnaire(id) {
     }
 }
 
-async function checkUserAccess(qnrId, userId) {
+async function checkUserAccess(qnrId, userId, edit = false) {
     const info = await getQuestionnaireInfo(userId);
     let ret;
     for (const i of info) {
@@ -78,11 +78,11 @@ async function checkUserAccess(qnrId, userId) {
         }
     }
 
-    if (ret != null) {
+    if (edit && ret != null) {
         if (ret.owner === "public" && ret.lock === true) {
-            return {valid: false, reason: "User cannot update this questionnaire", code: 401};
+            return {valid: false, reason: "User cannot access this questionnaire", code: 401};
         }
-    } else {
+    } else if (ret == null) {
         return {valid: false, reason: `Could not find questionnaire for user ${userId} with id ${qnrId}`, code: 404};
     }
 
@@ -179,7 +179,7 @@ async function updateQuestionnaire(name, questions, qnrId, userId) {
             return {valid: false, reason: `No questionnaire could be found with id '${qnrId}'`, code: 404};
 
         // check that the user has permissions for this questionnaire
-        const access = await checkUserAccess(qnrId, userId);
+        const access = await checkUserAccess(qnrId, userId, true);
         if (!access.valid) {
             return access;
         }
@@ -212,5 +212,6 @@ module.exports = {
     getQuestionnaire,
     deleteQuestionnaire,
     updateQuestionnaire,
-    addQuestionnaire
+    addQuestionnaire,
+    checkUserAccess
 };

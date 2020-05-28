@@ -20,8 +20,13 @@ async function getQuestionnaire() {
 
 async function getResponses() {
     const id = URLUtil.getQuestionnaireId();
+    let response;
+    if (AuthUtil.isUserSignedIn()) {
+        response = await fetch(`responses/${id}/${AuthUtil.getAuthToken()}`);
+    } else {
+        response = await fetch(`responses/${id}`);
+    }
 
-    const response = await fetch(`responses/${id}`);
     if (response.ok) {
         return await response.json();
     } else {

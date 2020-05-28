@@ -21,14 +21,25 @@ async function addResponse(req, res) {
 }
 
 async function getResponses(req, res) {
-    const responses = await resp.getResponses(req.params.id);
+    const token = req.params.token;
+    let response;
+    if (token != null) {
+        const tokenAuth = await auth.verifyToken(token);
+        if (!tokenAuth.valid) {
+            res.status(tokenAuth.code).send(tokenAuth.reason);
+            return;
+        }
+        response = await resp.getResponses(req.params.id, tokenAuth.id);
+    } else {
+        response = await resp.getResponses(req.params.id);
+    }
 
-    if (responses === undefined) {
-        res.status(404).send('No match for that ID.');
+    if (!response.valid) {
+        res.status(response.code).send(response.reason);
         return;
     }
 
-    res.json(responses);
+    res.json(response.responses);
 }
 
 async function getQuestionnaires(req, res) {
@@ -150,6 +161,8 @@ async function updateQuestionnaire(req, res) {
 app.post('/responses/:id', express.json(), addResponse);
 
 app.get('/responses/:id', getResponses);
+
+app.get('/responses/:id/:token', getResponses);
 
 app.put('/questionnaires/:id', express.json(), updateQuestionnaire);
 
