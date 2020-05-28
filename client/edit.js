@@ -1,37 +1,10 @@
 'use strict';
 
 import * as AuthUtil from "./lib/auth";
+import * as UIUtil from "./lib/interface";
 import * as URLUtil from "./lib/url";
 
 const pageElements = {};
-
-function hide(elem) {
-    elem.classList.add("hidden");
-}
-
-function show(elem) {
-    elem.classList.remove("hidden");
-}
-
-function removeParent(button) {
-    button.parentElement.remove();
-}
-
-function clearError() {
-    show(document.querySelector("main"));
-    const error = document.querySelector("h2.error");
-    if (error != null) {
-        error.remove();
-    }
-}
-
-function showError(message) {
-    hide(document.querySelector("main"));
-    const elem = document.createElement("h2");
-    elem.classList.add("error");
-    elem.append(document.createTextNode(message));
-    document.querySelector("body").append(elem);
-}
 
 function getFormData() {
     const data = {
@@ -75,7 +48,7 @@ async function saveQuestionnaire() {
     });
 
     if (response.ok) {
-        showError("Success");
+        UIUtil.showError("Success");
     } else {
         pageElements.error.textContent = `${response.status} ${response.statusText}: ${await response.text()}`;
     }
@@ -117,17 +90,11 @@ function checkOptionContainerVisibility(select) {
     const addOptionButton = fieldset.querySelector(".add-option");
 
     if (select.value === "single-select" || select.value === "multi-select") {
-        show(optionContainer);
-        show(addOptionButton);
+        UIUtil.show(optionContainer);
+        UIUtil.show(addOptionButton);
     } else {
-        hide(optionContainer);
-        hide(addOptionButton);
-    }
-}
-
-function clearQuestions() {
-    while (pageElements.firstElementChild) {
-        pageElements.firstElementChild.remove();
+        UIUtil.hide(optionContainer);
+        UIUtil.hide(addOptionButton);
     }
 }
 
@@ -164,7 +131,7 @@ function displayQuestion(question = {text: "", type: "text"}) {
     select.addEventListener('change', e => checkOptionContainerVisibility(e.target));
 
     const btnDelete = clone.querySelector(".delete");
-    btnDelete.addEventListener('click', e => removeParent(e.target));
+    btnDelete.addEventListener('click', e => UIUtil.removeParent(e.target));
 
     const optionContainer = clone.querySelector("ol");
 
@@ -176,8 +143,8 @@ function displayQuestion(question = {text: "", type: "text"}) {
             displayOption(option, optionContainer);
         }
 
-        show(optionContainer);
-        show(btnAddOption);
+        UIUtil.show(optionContainer);
+        UIUtil.show(btnAddOption);
     }
 
     pageElements.questions.append(clone);
@@ -185,20 +152,20 @@ function displayQuestion(question = {text: "", type: "text"}) {
 
 async function displayQuestionnaire() {
     if (URLUtil.getQuestionnaireId() == null) {
-        showError("No questionnaire to display, please specify id.");
+        UIUtil.showError("No questionnaire to display, please specify id.");
         return;
     }
 
     const qnr = await getQuestionnaire();
     if (qnr == null) {
-        showError("Failed to load questionnaire");
+        UIUtil.showError("Failed to load questionnaire");
         return;
     }
 
-    clearError();
+    UIUtil.clearError();
 
     pageElements.title.value = qnr.name;
-    clearQuestions();
+    UIUtil.removeChildren(pageElements.questions);
     for (const question of qnr.questions) {
         displayQuestion(question);
     }
@@ -281,7 +248,7 @@ async function checkAuth() {
     }
 
     if (!auth.valid) {
-        showError(auth.reason);
+        UIUtil.showError(auth.reason);
         return false;
     }
 

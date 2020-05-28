@@ -1,174 +1,32 @@
 'use strict';
 
-import * as URLUtil from "./lib/url"
+import * as AuthUtil from "./lib/auth";
+import * as UIUtil from "./lib/interface";
+import * as URLUtil from "./lib/url";
 
 const pageElements = {};
 
-async function getResponses() {
-    const response = await fetch(`/responses/${URLUtil.getQuestionnaireId()}`);
-
-    let responses;
-    if (response.ok) {
-        responses = await response.json();
-    } else {
-        responses = []; // TODO: better error handling
-    }
-
-    return responses;
-}
-
 async function getQuestionnaire() {
-    const response = await fetch(`/questionnaires/${URLUtil.getQuestionnaireId()}`);
+    const id = URLUtil.getQuestionnaireId();
 
-    let qnr;
+    const response = await fetch(`questionnaires/${id}`);
     if (response.ok) {
-        qnr = await response.json();
+        return await response.json();
     } else {
-        qnr = {name: "Failed to load questionnaire"}; // TODO: better error handling
-    }
-
-    return qnr;
-}
-
-function getHandles() {
-    pageElements.qnrName = document.querySelector("#questionnaire-name");
-    pageElements.respContainer = document.querySelector("#responses-container");
-    pageElements.exportJSON = document.querySelector("#export-json");
-}
-
-function addResponseContainer(question) {
-    const template = document.querySelector("#response");
-    const clone = template.content.cloneNode(true);
-
-    if (question.type === "single-select" || question.type === "multi-select") {
-        clone.querySelector(".responses").dataset.type = "select";
-
-        for (const option of question.options) {
-            const li = document.createElement("li");
-            li.dataset.option = option;
-            li.append(document.createTextNode(`${option}: `));
-
-            const span = document.createElement("span");
-            span.append(document.createTextNode("0"));
-            li.append(span);
-
-            li.dataset.id = JSON.stringify([]);
-
-            clone.querySelector(".responses").append(li);
-        }
-    }
-
-    clone.querySelector(".response-title").textContent = question.text;
-    clone.querySelector(".responses").dataset.id = question.id;
-
-    pageElements.respContainer.appendChild(clone);
-}
-
-function highlightResponses(event) {
-    const ids = JSON.parse(event.target.dataset.id);
-    const allResponses = document.querySelectorAll(".responses > li");
-
-    if (event.type === "mouseenter") {
-        for (const id of ids) {
-            for (const response of allResponses) {
-                const resIds = JSON.parse(response.dataset.id);
-                if (resIds.includes(id)) {
-                    response.style = "font-weight: bold;"; // TODO: use CSS classes instead
-                }
-            }
-        }
-    } else if (event.type === "mouseout") {
-        for (const id of ids) {
-            for (const response of allResponses) {
-                const resIds = JSON.parse(response.dataset.id);
-                if (resIds.includes(id)) {
-                    response.style = "";
-                }
-            }
-        }
+        console.error(await response.text());
+        return undefined;
     }
 }
 
-function updateSelectCount(li, i) {
-    const array = JSON.parse(`${li.dataset.id}`);
-    array.push(i);
-    li.dataset.id = JSON.stringify(array);
+async function getResponses() {
+    const id = URLUtil.getQuestionnaireId();
 
-    const span = li.querySelector("span");
-    span.textContent = String(Number(span.textContent) + 1);
-}
-
-function addResponse(response, i) {
-    for (const key of Object.keys(response)) {
-        const ul = document.querySelector(`[data-id~="${key}"]`);
-
-        if (ul == null) // If the response contains a question that the questionnaire does not, skip
-            continue;
-
-        if (ul.dataset.type === "select") {
-            const ans = response[key];
-            if (typeof ans === "object") {
-                for (const elem of ans) {
-                    const li = ul.querySelector(`[data-option~="${elem}"]`);
-                    updateSelectCount(li, i);
-                }
-            } else {
-                const li = ul.querySelector(`[data-option~="${ans}"]`);
-                updateSelectCount(li, i)
-            }
-        } else {
-            const li = document.createElement("li");
-
-            li.appendChild(document.createTextNode(response[key]));
-            li.dataset.id = JSON.stringify([i]);
-            ul.appendChild(li);
-
-            li.addEventListener('mouseenter', highlightResponses);
-            li.addEventListener('mouseout', highlightResponses);
-        }
-    }
-}
-
-function addGraph(question) {
-    const ul = document.querySelector(`[data-id~="${question.id}"]`);
-    const lis = ul.querySelectorAll("li");
-    const obj = {};
-
-    for (const li of lis) {
-        obj[li.dataset.option] = Number(li.querySelector("span").textContent);
-    }
-
-    const graph = document.createElement("custom-bar-graph");
-    graph.dataset.value = JSON.stringify(obj);
-    graph.dataset.title = question.text;
-
-    ul.insertAdjacentElement('afterend', graph);
-}
-
-async function initPage() {
-    const qnr = await getQuestionnaire();
-
-    pageElements.qnrName.textContent = qnr.name;
-
-    const questionsToGraph = [];
-    for (const question of qnr.questions) { // Create containers for question responses
-        addResponseContainer(question);
-
-        if (question.type === "single-select" || question.type === "multi-select") {
-            questionsToGraph.push(question);
-        }
-    }
-
-    const responses = await getResponses();
-
-    let i = 0;
-    for (const response of responses) {
-        addResponse(response, i);
-        i++;
-    }
-
-    for (const question of questionsToGraph) {
-        addGraph(question);
+    const response = await fetch(`responses/${id}`);
+    if (response.ok) {
+        return await response.json();
+    } else {
+        console.error(await response.text());
+        return undefined;
     }
 }
 
@@ -189,14 +47,154 @@ async function exportToFile(format) {
     }
 }
 
+function addGraph(question) {
+    const ul = document.querySelector(`[data-id~="${question.id}"]`);
+    const spans = ul.querySelectorAll("span");
+    const obj = {};
+
+    for (const span of spans) {
+        obj[span.dataset.option] = Number(span.textContent);
+    }
+
+    const graph = document.createElement("custom-bar-graph");
+    graph.dataset.value = JSON.stringify(obj);
+    graph.dataset.title = question.text;
+
+    ul.insertAdjacentElement('afterend', graph);
+}
+
+async function displayResponses(qnr) {
+    UIUtil.clearError();
+    UIUtil.removeChildren(pageElements.responsesContainer);
+    UIUtil.showError("Loading...");
+
+    // Retrieve questionnaire from local storage
+    if (qnr == null) {
+        UIUtil.clearError();
+        UIUtil.showError("Could not find questionnaire.");
+        return;
+    }
+
+    // Fetch responses
+    const responses = await getResponses();
+    if (responses == null) {
+        UIUtil.clearError();
+        UIUtil.showError("Could not get responses.");
+        return;
+    }
+
+    // Create templates for inserting responses
+    pageElements.name.textContent = qnr.name;
+    for (const question of qnr.questions) {
+        const clone = pageElements.templateResponse.content.cloneNode(true);
+        clone.querySelector("h3").textContent = question.text;
+        clone.querySelector("ul").dataset.id = question.id;
+
+        // Add counter for single-select or multi-select questions
+        if (question.type === "single-select" || question.type === "multi-select") {
+            for (const option of question.options) {
+                const li = document.createElement("li");
+                li.append(document.createTextNode(`${option}: `));
+
+                // Store the option title in dataset for easy retrieval
+                // Spaces are removed as it cannot be accessed otherwise
+                const span = document.createElement("span");
+                span.dataset.option = option.replace(/\s/g, '');
+                span.textContent = "0";
+                li.append(span);
+
+                clone.querySelector("ul").append(li);
+            }
+        }
+
+        pageElements.responsesContainer.append(clone);
+    }
+
+    // Insert responses
+    for (const response of responses) {
+        for (const key of Object.keys(response)) {
+            // Get question from response key
+            let question = qnr.questions.filter(question => question.id === key);
+            if (question.length === 0) {
+                console.error(`Unexpected response key '${key}'`);
+                continue;
+            }
+            question = question[0];
+
+            // Get ul element from key
+            const ul = document.querySelector(`ul[data-id~="${key}"`);
+            if (ul == null) {
+                console.error(`Unexpected response key '${key}'`);
+                continue;
+            }
+
+            // Add data to interface based on question type
+            if (question.type === "single-select" || question.type === "multi-select") {
+                if (typeof response[key] === "string") {
+                    response[key] = [response[key]];
+                }
+
+                for (const option of response[key]) {
+                    const counter = ul.querySelector(`span[data-option~="${option.replace(/\s/g, '')}"]`);
+
+                    if (counter == null) {
+                        console.log(`"Couldn't find span[data-option~="${option.replace(/\s/g, '')}"]"`)
+                    }
+
+                    const count = Number(counter.textContent);
+                    counter.textContent = String(count + 1);
+                }
+            } else {
+                const li = document.createElement("li");
+                li.append(document.createTextNode(response[key]));
+                ul.append(li);
+            }
+        }
+    }
+
+    // Draw graphs
+    for (const question of qnr.questions) {
+        if (question.type === "single-select" || question.type === "multi-select") {
+            addGraph(question);
+        }
+    }
+
+    UIUtil.clearError();
+}
+
 function addEventListeners() {
     pageElements.exportJSON.addEventListener('click', async () => await exportToFile("json"));
 }
 
+function getHandles() {
+    pageElements.name = document.querySelector("#questionnaire-name");
+    pageElements.responsesContainer = document.querySelector("#responses-container");
+    pageElements.templateResponse = document.querySelector("#response");
+    pageElements.exportJSON = document.querySelector("#export-json");
+}
+
+async function checkAuth() {
+    return true; // TODO
+}
+
+async function reload() {
+    if (!await checkAuth()) {
+        return;
+    }
+
+    const qnr = await getQuestionnaire();
+
+    await displayResponses(qnr);
+}
+
 async function onPageLoad() {
+    AuthUtil.init();
+
     getHandles();
     addEventListeners();
-    await initPage();
+
+    AuthUtil.onSignIn(reload); // Re-load if user signs in
+    await reload(); // Check auth on page load; user can edit public if not signed in
 }
 
 window.addEventListener('load', onPageLoad);

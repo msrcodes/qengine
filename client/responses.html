@@ -4,19 +4,23 @@
     <meta charset="UTF-8">
     <title>QEngine</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="responses.js" type="module"></script>
     <script src="lib/graph.js" type="module"></script>
 </head>
 <body>
 <header>
     <h1>QEngine</h1>
-    <h2 id="questionnaire-name">Loading...</h2>
+    <div class="g-signin2"></div>
+    <a href="#" class="signOut">Sign out</a>
+    <h2 id="questionnaire-name"></h2>
 </header>
 <button id="export-json">Export to JSON</button>
 <main id="responses-container">
     <template id="response">
-        <h3 class="response-title"></h3>
-        <ul class="responses">
+        <h3></h3>
+        <ul>
 
         </ul>
     </template>
