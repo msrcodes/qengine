@@ -180,7 +180,53 @@ function getHandles() {
 }
 
 async function checkAuth() {
-    return true; // TODO
+    let auth = {};
+
+    // Bypass auth if it's a public questionnaire
+    const res = await fetch("/questionnaireInfo");
+    if (res.ok) {
+        const json = await res.json();
+        for (const obj of json) {
+            if (obj.id === URLUtil.getQuestionnaireId() && obj.owner === "public") {
+                return true;
+            }
+        }
+    } else {
+        console.error("failed to fetch");
+    }
+
+    // Check if user is signed in
+    if (AuthUtil.isUserSignedIn()) {
+        const res = await fetch(`/questionnaireInfo/${AuthUtil.getAuthToken()}`);
+        if (res.ok) {
+            const json = await res.json();
+
+            // If they are signed in, check if they own this questionnaire
+            let found = false;
+            for (const obj of json) {
+                if (obj.id === URLUtil.getQuestionnaireId()) {
+                    found = true;
+                    auth = {valid: true};
+                    break;
+                }
+            }
+
+            if (!found) {
+                auth = {valid: false, reason: "User does not have access to this questionnaire."};
+            }
+        } else {
+            auth = {valid: false, reason: res.statusText};
+        }
+    } else {
+        auth = {valid: false, reason: "User is not logged in."};
+    }
+
+    if (!auth.valid) {
+        UIUtil.showError(auth.reason);
+        return false;
+    }
+
+    return true;
 }
 
 async function reload() {
