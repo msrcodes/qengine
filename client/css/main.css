@@ -87,3 +87,24 @@ fieldset {
     grid-template-columns: max-content auto;
     column-gap: 1rem;
 }
+
+@media (max-width: 520px) {
+    :root {
+        --padding: 1rem 1rem;
+    }
+
+    header {
+        grid-template-rows: auto;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "a a" "b c";
+    }
+
+    header h1 {
+        grid-area: a;
+        justify-self: center;
+    }
+
+    header > div, header > a {
+        justify-self: center;
+    }
+}
