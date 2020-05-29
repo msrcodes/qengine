@@ -1,7 +1,8 @@
 'use strict';
 
-import * as AuthUtil from "./lib/auth"
-import * as URLUtil from "./lib/url"
+import * as AuthUtil from "./lib/auth";
+import * as UIUtil from "./lib/interface";
+import * as URLUtil from "./lib/url";
 
 const pageElements = {};
 
@@ -57,9 +58,8 @@ function toggleLoadText() {
 }
 
 function clearTemplate() {
-    while (pageElements.questionnaireContainer.hasChildNodes()) {
-        pageElements.questionnaireContainer.firstChild.remove();
-    }
+    UIUtil.removeChildren(pageElements.questionnaireContainer);
+    UIUtil.removeChildren(pageElements.publicQnrs);
 }
 
 function populateTemplate(obj) {
@@ -83,9 +83,9 @@ function populateTemplate(obj) {
 async function getQuestionnaireInfo(authToken) {
     let res;
     if (authToken == null) {
-        res = await fetch("/questionnaireInfo/");
+        res = await fetch("/questionnaireInfo/lim/1");
     } else {
-        res = await fetch(`/questionnaireInfo/${authToken}`);
+        res = await fetch(`/questionnaireInfo/${authToken}/lim/1`);
     }
 
     if (res.ok) {

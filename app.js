@@ -55,6 +55,7 @@ async function getQuestionnaires(req, res) {
 
 async function getQuestionnaireInfo(req, res) {
     const token = req.params.token;
+    const limit = Number(req.params.limit);
 
     let response;
     if (token != null) {
@@ -71,6 +72,26 @@ async function getQuestionnaireInfo(req, res) {
 
     if (response.code === 400) {
         res.status(400).send(response.reason);
+        return;
+    }
+
+    const ret = [];
+    let i = 0;
+    if (limit != null) {
+        for (const r of response) {
+            if (r.owner === 'user') {
+                ret.push(r);
+            } else if (r.owner === 'public') {
+                if (i >= limit) {
+                    continue;
+                }
+
+                ret.push(r);
+                i++;
+            }
+        }
+
+        res.json(ret);
         return;
     }
 
@@ -179,6 +200,10 @@ app.get('/questionnaires/:id', getQuestionnaire);
 app.get('/questionnaireInfo', getQuestionnaireInfo);
 
 app.get('/questionnaireInfo/:token', getQuestionnaireInfo);
+
+app.get('/questionnaireInfo/lim/:limit', getQuestionnaireInfo);
+
+app.get('/questionnaireInfo/:token/lim/:limit', getQuestionnaireInfo);
 
 app.get('/questionnaires', getQuestionnaires);
 
