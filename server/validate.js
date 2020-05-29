@@ -165,7 +165,7 @@ function validateQNRResponse(response, questionnaire) {
     // Check all required questions have been answered
     for (const question of questionnaire.questions) {
         if (question.required == null || question.required === true) {
-            if (response[question.id] == null) {
+            if (response[question.id] == null || response[question.id] === "") {
                 return {
                     valid: false,
                     reason: "All required questions must be answered",
