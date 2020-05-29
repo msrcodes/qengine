@@ -50,7 +50,17 @@ header > div, header > a {
     justify-self: end;
 }
 
-header > a {
+header a {
+    text-decoration: none;
+    color: black;
+    justify-self: left;
+}
+
+header:hover {
+    text-decoration: underline;
+}
+
+.signOut {
     color: #757575;
     text-decoration: none;
     padding: 0.5em 2em;
@@ -59,7 +69,7 @@ header > a {
     background-color: white;
 }
 
-header > a:hover {
+.signOut:hover {
     box-shadow: var(--hov-shadow);
 }
 
