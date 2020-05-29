@@ -1,11 +1,15 @@
 'use strict';
 
+const bodyParser = require('body-parser');
 const express = require('express');
 const auth = require("./server/auth");
 const qnr = require("./server/questionnaires");
 const resp = require("./server/responses");
 
 const app = express();
+
+app.use(bodyParser.json({limit: '5mb'}));
+app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
 
 app.use(express.static('client', {extensions: ['html', 'js']}));
 

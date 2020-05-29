@@ -84,9 +84,9 @@ function populateTemplate(obj) {
 async function getQuestionnaireInfo(authToken) {
     let res;
     if (authToken == null) {
-        res = await fetch("/questionnaireInfo/lim/1");
+        res = await fetch("/questionnaireInfo/lim/10");
     } else {
-        res = await fetch(`/questionnaireInfo/${authToken}/lim/1`);
+        res = await fetch(`/questionnaireInfo/${authToken}/lim/10`);
     }
 
     if (res.ok) {
