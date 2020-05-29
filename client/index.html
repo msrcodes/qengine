@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>QEngine</title>
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/index.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
@@ -16,24 +17,31 @@
     <a href="#" class="signOut">Sign out</a>
 </header>
 <main>
-    <h2>Create a new Questionnaire</h2>
-    <button id="create">Create from scratch</button>
-    <a href="/import"><button>Import from JSON</button></a>
-    <h2>Your Questionnaires</h2>
     <section>
-        <ul id="questionnaire-container">
+        <h2>Create a new Questionnaire</h2>
+        <button id="create">Create from scratch</button>
+        <a href="/import"><button>Import from JSON</button></a>
+    </section>
+    <section>
+        <h2>Your Questionnaires</h2>
+        <ul id="questionnaire-container" class="qnr-container">
 
         </ul>
-        <template id="questionnaire-template">
-            <li>
-                <h3>Example Questionnaire</h3>
-                <h4>Created by: </h4>
-                <a href="" class="respond"><button>Respond</button></a>
-                <a href="" class="edit"><button>Edit</button></a>
-                <a href="" class="responses"><button>View Responses</button></a>
-            </li>
-        </template>
     </section>
+    <section>
+        <h2>Public Questionnaires</h2>
+        <ul id="public-questionnaire-container" class="qnr-container">
+
+        </ul>
+    </section>
+    <template id="questionnaire-template">
+        <li>
+            <h3>Example Questionnaire</h3>
+            <a href="" class="respond"><button>Respond</button></a>
+            <a href="" class="edit"><button>Edit</button></a>
+            <a href="" class="responses"><button>View Responses</button></a>
+        </li>
+    </template>
 </main>
 </body>
 </html>

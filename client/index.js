@@ -7,6 +7,7 @@ const pageElements = {};
 
 function getHandles() {
     pageElements.createBtn = document.querySelector("#create");
+    pageElements.publicQnrs = document.querySelector("#public-questionnaire-container");
     pageElements.questionnaireContainer = document.querySelector("#questionnaire-container");
     pageElements.questionnaireTemplate = document.querySelector("#questionnaire-template");
     pageElements.signOut = document.querySelector(".signOut");
@@ -70,13 +71,13 @@ function populateTemplate(obj) {
     clone.querySelector(".responses").href = URLUtil.getURL("responses", obj.id);
 
     if (obj.owner === "user") {
-        clone.querySelector("h4").textContent = "Owned by you.";
+        pageElements.questionnaireContainer.append(clone);
     } else if (obj.owner === "public") {
-        clone.querySelector("h4").textContent = "A public questionnaire.";
         clone.querySelector(".edit").remove();
+        pageElements.publicQnrs.append(clone);
     }
 
-    pageElements.questionnaireContainer.append(clone);
+
 }
 
 async function getQuestionnaireInfo(authToken) {

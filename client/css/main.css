@@ -88,10 +88,6 @@ fieldset {
     column-gap: 1rem;
 }
 
-.option-container {
-
-}
-
 @media (max-width: 520px) {
     :root {
         --padding: 1rem 1rem;

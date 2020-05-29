@@ -1,0 +1,22 @@
+.qnr-container {
+    padding: 0 1rem 0 0;
+
+    height: 25vh;
+    overflow-y: scroll;
+}
+
+.qnr-container li {
+    margin: 0 0 1rem 1rem;
+    list-style: none;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    background-color: #aec0d8;
+}
+
+.qnr-container li:hover {
+    box-shadow: var(--hov-shadow);
+}
+
+.qnr-container h3 {
+    margin: 0.5rem 0;
+}
