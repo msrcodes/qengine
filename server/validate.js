@@ -69,7 +69,7 @@ function validateQuestion(question) {
     if (question.options != null) {
         const temp = [];
         if (question.options.length > 10) {
-            return {valid: false, reason: `Must be fewer than 10 options. '${question.options}' contains more than 10 options.`};
+            return {valid: false, reason: `Must be fewer than 10 options. '${question.options}' contains more than 10 options.`, code: 400};
         }
 
         for (const option of question.options) {
@@ -82,7 +82,7 @@ function validateQuestion(question) {
             }
 
             if (option.length > 256) {
-                return {valid: false, reason: `Options must be fewer than 256 characters. Option '${option}' is longer than 256 characters`}
+                return {valid: false, reason: `Options must be fewer than 256 characters. Option '${option}' is longer than 256 characters`, code: 400}
             }
 
             temp.push(option);
@@ -91,7 +91,7 @@ function validateQuestion(question) {
 
     // Validation 8
     if (question.text.length > 256) {
-        return {valid: false, reason: `Questions must be fewer than 256 characters. Question '${question.text}' is longer than 256 characters`};
+        return {valid: false, reason: `Questions must be fewer than 256 characters. Question '${question.text}' is longer than 256 characters`, code: 400};
     }
 
     return {valid: true, code: 200};
