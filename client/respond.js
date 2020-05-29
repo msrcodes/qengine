@@ -68,40 +68,45 @@ async function postResponse() {
     }
 }
 
-function displayQuestion(data) {
-    const template = getTemplateFromType(data.type);
+function displayQuestion(question) {
+    const template = getTemplateFromType(question.type);
 
     if (template === undefined) {
-        console.log("unable to create question of type", data.type); // TODO: proper error handling
+        console.log("unable to create question of type", question.type); // TODO: proper error handling
         return;
     }
 
     // clone template
     const templateClone = template.content.cloneNode(true);
-    templateClone.querySelector("fieldset").dataset.id = data.id;
+    templateClone.querySelector("fieldset").dataset.id = question.id;
     
     // populate templateClone with data
-    templateClone.querySelector(".text").textContent = data.text;
+    templateClone.querySelector(".text").textContent = question.text;
 
     if (templateClone.querySelector("input") !== null) {
-        templateClone.querySelector("input").id = `${data.id}`;
-        templateClone.querySelector("label").htmlFor = `${data.id}`;
+        templateClone.querySelector("input").id = `${question.id}`;
+        templateClone.querySelector("label").htmlFor = `${question.id}`;
+    }
+
+    // mark as required
+    if (question.required || question.required == null) {
+        templateClone.querySelector(".text").classList.add("required");
     }
 
     // if a question should have an options attribute, populate options
-    const optionTemplate = document.querySelector("#option-" + data.type);
+    const optionTemplate = document.querySelector("#option-" + question.type);
     if (optionTemplate != null) {
         const optionContainer = templateClone.querySelector(".option-container");
 
         let i = 0;
-        for (const option of data.options) {
+        for (const option of question.options) {
             const optionClone = optionTemplate.content.cloneNode(true);
 
             optionClone.querySelector(".option-text").textContent = option;
 
-            optionClone.querySelector("input").id = `${data.id}-${i}`;
-            optionClone.querySelector("input").name = `${data.id}`;
-            optionClone.querySelector("label").htmlFor = `${data.id}-${i}`;
+            optionClone.querySelector("input").id = `${question.id}-${i}`;
+            optionClone.querySelector("input").name = `${question.id}`;
+            optionClone.querySelector("label").htmlFor = `${question.id}-${i}`;
             i++;
 
             optionContainer.append(optionClone);
@@ -115,6 +120,7 @@ function displayQuestionnaire(obj) {
     pageElements.qnrName.textContent = obj.name;
 
     for (const question of obj.questions) {
+        console.log(question);
         displayQuestion(question);
     }
 

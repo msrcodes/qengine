@@ -25,6 +25,11 @@
     display: none;
 }
 
+.required:after {
+    color: darkred;
+    content: '*';
+}
+
 body {
     margin: 0;
     background-color: var(--bg);
