@@ -65,9 +65,13 @@ function validateQuestion(question) {
         return {valid: false, reason: "Question must have ID", code: 400};
     }
 
-    // Validation rule 5 + 6
+    // Validation rules 5 + 6 + 7 + 8
     if (question.options != null) {
         const temp = [];
+        if (question.options.length > 10) {
+            return {valid: false, reason: `Must be fewer than 10 options. '${question.options}' contains more than 10 options.`};
+        }
+
         for (const option of question.options) {
             if (option === "") {
                 return {valid: false, reason: "No option may be empty.", code: 400};
@@ -77,8 +81,17 @@ function validateQuestion(question) {
                 return {valid: false, reason: `Question options must be unique. Found duplicate option '${option}'`, code: 400};
             }
 
+            if (option.length > 256) {
+                return {valid: false, reason: `Options must be fewer than 256 characters. Option '${option}' is longer than 256 characters`}
+            }
+
             temp.push(option);
         }
+    }
+
+    // Validation 8
+    if (question.text.length > 256) {
+        return {valid: false, reason: `Questions must be fewer than 256 characters. Question '${question.text}' is longer than 256 characters`};
     }
 
     return {valid: true, code: 200};
