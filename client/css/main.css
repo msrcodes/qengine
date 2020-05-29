@@ -17,6 +17,10 @@
     font-weight: bold;
 }
 
+.pad {
+    padding: var(--padding);
+}
+
 .hidden {
     display: none;
 }

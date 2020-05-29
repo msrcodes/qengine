@@ -32,7 +32,7 @@ export function clearError() {
 export function showError(message) {
     hide(document.querySelector("main"));
     const elem = document.createElement("h2");
-    elem.classList.add("error");
+    elem.classList.add("error", "pad");
     elem.append(document.createTextNode(message));
     document.querySelector("body").append(elem);
 }
