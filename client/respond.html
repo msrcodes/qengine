@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>QEngine</title>
+    <link rel="stylesheet" href="css/main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="respond.js" type="module"></script>
 </head>
 <body>
     <header>
-        <h1>QEngine</h1>
+        <h1>QEngine - Respond</h1>
         <h2 id="questionnaire-name">Loading...</h2>
     </header>
-    <div id="questionnaire-container">
+    <main id="questionnaire-container">
+        <p id="error-text" class="error"></p>
         <template id="question-text">
             <fieldset>
                 <legend><label for="text-input" class="text"></label></legend>
@@ -42,6 +44,6 @@
             <input type="checkbox" id="checkbox-input">
             <label for="checkbox-input" class="option-text"></label>
         </template>
-    </div>
+    </main>
 </body>
 </html>

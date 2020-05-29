@@ -128,7 +128,7 @@ function displayOption(option, container) {
     const clone = pageElements.templateOption.content.cloneNode(true);
 
     clone.querySelector("input").value = option;
-    clone.querySelector("button").addEventListener('click', e => removeParent(e.target));
+    clone.querySelector("button").addEventListener('click', e => UIUtil.removeParent(e.target));
 
     container.append(clone);
 }
@@ -210,6 +210,7 @@ function getHandles() {
     pageElements.respondLink = document.querySelector("#questionnaire-link");
     pageElements.responsesLink = document.querySelector("#responses-link");
     pageElements.save = document.querySelector("#update");
+    pageElements.signOut = document.querySelector(".signOut");
 }
 
 async function checkAuth() {
@@ -270,6 +271,12 @@ async function checkAuth() {
 }
 
 async function reload() {
+    if (AuthUtil.isUserSignedIn()) {
+        pageElements.signOut.classList.remove("hidden");
+    } else {
+        pageElements.signOut.classList.add("hidden");
+    }
+
     if (!await checkAuth()) {
         return;
     }

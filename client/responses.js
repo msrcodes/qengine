@@ -172,10 +172,11 @@ function addEventListeners() {
 }
 
 function getHandles() {
+    pageElements.exportJSON = document.querySelector("#export-json");
     pageElements.name = document.querySelector("#questionnaire-name");
     pageElements.responsesContainer = document.querySelector("#responses-container");
+    pageElements.signOut = document.querySelector(".signOut");
     pageElements.templateResponse = document.querySelector("#response");
-    pageElements.exportJSON = document.querySelector("#export-json");
 }
 
 async function checkAuth() {
@@ -183,6 +184,12 @@ async function checkAuth() {
 }
 
 async function reload() {
+    if (AuthUtil.isUserSignedIn()) {
+        pageElements.signOut.classList.remove("hidden");
+    } else {
+        pageElements.signOut.classList.add("hidden");
+    }
+
     if (!await checkAuth()) {
         return;
     }

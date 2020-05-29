@@ -6,9 +6,10 @@ import * as URLUtil from "./lib/url"
 const pageElements = {};
 
 function getHandles() {
-    pageElements.questionnaireContainer = document.querySelector("#questionnaire-container");
     pageElements.createBtn = document.querySelector("#create");
+    pageElements.questionnaireContainer = document.querySelector("#questionnaire-container");
     pageElements.questionnaireTemplate = document.querySelector("#questionnaire-template");
+    pageElements.signOut = document.querySelector(".signOut");
 }
 
 async function createQuestionnaire() {
@@ -100,6 +101,9 @@ async function initPage(signedIn) {
     let authToken;
     if (signedIn) {
         authToken = AuthUtil.getAuthToken();
+        pageElements.signOut.classList.remove("hidden");
+    } else {
+        pageElements.signOut.classList.add("hidden");
     }
 
     const info = await getQuestionnaireInfo(authToken);
@@ -117,9 +121,10 @@ async function initPage(signedIn) {
 }
 
 async function onPageLoad() {
+    AuthUtil.init();
     getHandles();
     addEventListeners();
-    AuthUtil.init();
+
     AuthUtil.onSignIn(initPage);
     await initPage(false);
 }

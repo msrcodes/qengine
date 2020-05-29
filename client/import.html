@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>QEngine</title>
+    <link rel="stylesheet" href="css/main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="import.js" type="module"></script>
 </head>
 <body>
-<h1>QEngine - Import</h1>
-<div class="g-signin2"></div>
-<a href="#" class="signOut">Sign out</a>
+<header>
+    <h1>QEngine - Import</h1>
+    <div class="g-signin2"></div>
+    <a href="#" class="signOut">Sign out</a>
+</header>
 <main>
-    <p id="error-text"></p>
-    <label for="json-input">Input JSON:</label>
+    <p id="error-text" class="error"></p>
+    <h2><label for="json-input">Input JSON</label></h2>
     <textarea name="json-input" id="json-input" cols="75" rows="30"></textarea>
     <!--NB: autocomplete off fixes bug 654072 in Firefox. all other browsers don't require this functionality -->
     <button id="import-btn" autocomplete="off">Import</button>

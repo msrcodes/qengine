@@ -1,5 +1,6 @@
 'use strict';
 
+import * as UIUtil from "./lib/interface";
 import * as URLUtil from "./lib/url"
 
 const pageElements = {};
@@ -59,9 +60,9 @@ async function postResponse() {
     });
 
     if (response.ok) {
-        window.alert("response ok!"); // TODO: redirect to appropriate page
+        UIUtil.showError("Success.");
     } else {
-        console.log("failed to post response", response);
+        pageElements.error.textContent = await response.text();
     }
 }
 
@@ -123,6 +124,7 @@ function displayQuestionnaire(obj) {
 }
 
 function getHandles() {
+    pageElements.error = document.querySelector("#error-text");
     pageElements.qnrName = document.querySelector("#questionnaire-name");
     pageElements.qnrContainer = document.querySelector("#questionnaire-container");
     pageElements.templateTextQ = document.querySelector("#question-text");

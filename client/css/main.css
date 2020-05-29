@@ -1,0 +1,89 @@
+:root {
+    --padding: 1rem 5rem;
+    --font: sans-serif;
+    --shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
+    --hov-shadow: 0 0 3px 3px rgba(66,133,244,.3);
+    --header-bg: lightsteelblue;
+    --bg: #eeeeee;
+}
+
+* {
+    font-family: var(--font);
+    transition: box-shadow .218s;
+}
+
+.error {
+    color: darkred;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg);
+}
+
+header {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: auto max-content max-content;
+    column-gap: 1em;
+    align-items: center;
+    padding: var(--padding);
+    margin: 0;
+    background-color: var(--header-bg);
+}
+
+header > div, header > a {
+    justify-self: end;
+}
+
+header > a {
+    color: #757575;
+    text-decoration: none;
+    padding: 0.5em 2em;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    background-color: white;
+}
+
+header > a:hover {
+    box-shadow: var(--hov-shadow);
+}
+
+main {
+    padding: var(--padding);
+}
+
+button {
+    padding: 0.3rem;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+}
+
+button:hover {
+    box-shadow: var(--hov-shadow);
+}
+
+textarea {
+    resize: none;
+    width: 100%;
+}
+
+fieldset {
+    margin: 1em 0;
+}
+
+.legend-edit {
+    width: 100%;
+}
+
+.legend-edit label {
+    display: grid;
+    grid-template-rows: auto;
+    grid-template-columns: max-content auto;
+    column-gap: 1rem;
+}

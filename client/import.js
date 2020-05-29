@@ -92,12 +92,22 @@ function getHandles() {
     pageElements.errorText = document.querySelector("#error-text");
     pageElements.jsonInput = document.querySelector("#json-input");
     pageElements.importBtn = document.querySelector("#import-btn");
+    pageElements.signOut = document.querySelector(".signOut");
+}
+
+async function showHideSignOut() {
+    if (AuthUtil.isUserSignedIn()) {
+        pageElements.signOut.classList.remove("hidden");
+    } else {
+        pageElements.signOut.classList.add("hidden");
+    }
 }
 
 async function onPageLoad() {
     AuthUtil.init();
     getHandles();
     addEventListeners();
+    AuthUtil.onSignIn(showHideSignOut);
 }
 
 window.addEventListener('load', onPageLoad);

@@ -3,25 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>QEngine</title>
+    <link rel="stylesheet" href="css/main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script src="edit.js" type="module"></script>
-    <style>
-        .hidden {
-            display: none;
-        }
-    </style>
 </head>
 <body>
-    <h1>QEngine - Edit</h1>
-    <div class="g-signin2"></div>
-    <a href="#" class="signOut">Sign out</a>
+    <header>
+        <h1>QEngine - Edit</h1>
+        <div class="g-signin2"></div>
+        <a href="#" class="signOut">Sign out</a>
+    </header>
     <main class="hidden">
         <label for="questionnaire-name">Questionnaire Title:</label>
         <input id="questionnaire-name" type="text"/>
         <button id="btn-delete-questionnaire">Delete questionnaire</button>
-        <a href="" id="responses-link">View Responses</a>
+        <a href="" id="responses-link"><button>View Responses</button></a>
         <p id="error"></p>
         <div id="questions">
 
@@ -29,7 +27,7 @@
         <button id="add-question">Add question</button>
         <template id="template-question">
             <fieldset>
-                <legend>
+                <legend class="legend-edit">
                     <label>Question title:
                         <input type="text">
                     </label>
