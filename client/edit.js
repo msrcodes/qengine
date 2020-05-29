@@ -55,7 +55,16 @@ async function updateQuestionnaire() {
     });
 
     if (response.ok) {
-        UIUtil.showError("Success");
+        const main = document.querySelector("main");
+        UIUtil.removeChildren(main);
+
+        let menu = [
+            {url: "responses", text: "View Responses"},
+            {url: "respond", text: "Respond to this questionnaire"},
+            {url: "edit", text: "Edit this questionnaire again"}
+        ];
+
+        UIUtil.showOptionsMenu(menu, "Successfully edited.", main, URLUtil.getQuestionnaireId());
     } else {
         pageElements.error.textContent = `${response.status} ${response.statusText}: ${await response.text()}`;
     }

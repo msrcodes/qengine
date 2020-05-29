@@ -1,6 +1,7 @@
 'use strict';
 
 import * as AuthUtil from "./lib/auth";
+import * as UIUtil from "./lib/interface";
 import * as URLUtil from "./lib/url";
 
 const pageElements = {};
@@ -40,36 +41,20 @@ async function createFromJSON() {
         const id = await res.json();
 
         const main = document.querySelector("main");
-        while (main.hasChildNodes()) {
-            main.removeChild(main.firstChild);
-        }
+        UIUtil.removeChildren(main);
 
-        const p = document.createElement("p");
-        p.append(document.createTextNode("Import successful. The questionnaire has now been published."));
-        main.append(p);
-
-        const ul = document.createElement("ul");
-
-        const links = [
+        let menu = [
             {url: "responses", text: "View Responses"},
             {url: "respond", text: "Respond to this questionnaire"},
             {url: "edit", text: "Edit this questionnaire"}
         ];
-
-        for (const i of links) {
-            const li = document.createElement("li");
-            const a = document.createElement("a");
-            a.append(document.createTextNode(i.text));
-            a.href = URLUtil.getURL(i.url, id);
-            li.append(a);
-            ul.append(li);
-        }
+        const message = "Import successful. The questionnaire has now been published.";
 
         if (!AuthUtil.isUserSignedIn()) {
-            ul.lastChild.remove();
+            menu.pop();
         }
 
-        main.append(ul);
+        UIUtil.showOptionsMenu(menu, message, main, id);
     } else {
         const errorText = await res.text();
 

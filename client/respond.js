@@ -60,7 +60,9 @@ async function postResponse() {
     });
 
     if (response.ok) {
-        UIUtil.showError("Success.");
+        const main = document.querySelector("main");
+        UIUtil.removeChildren(main);
+        UIUtil.showOptionsMenu([], "Successfully responded.", main);
     } else {
         pageElements.error.textContent = await response.text();
     }

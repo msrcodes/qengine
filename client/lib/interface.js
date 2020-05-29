@@ -1,5 +1,8 @@
 'use strict';
 
+import * as URLUtil from "./url";
+import * as AuthUtil from "./auth";
+
 export function removeChildren(elem) {
     while (elem.firstElementChild) {
         elem.firstElementChild.remove();
@@ -32,4 +35,30 @@ export function showError(message) {
     elem.classList.add("error");
     elem.append(document.createTextNode(message));
     document.querySelector("body").append(elem);
+}
+
+export function showOptionsMenu(menu, message, container, id) {
+    const p = document.createElement("p");
+    p.append(document.createTextNode(message));
+
+    const ul = document.createElement("ul");
+
+    for (const i of menu) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.append(document.createTextNode(i.text));
+        a.href = URLUtil.getURL(i.url, id);
+        li.append(a);
+        ul.append(li);
+    }
+
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.append(document.createTextNode("Return home"));
+    a.href = "/";
+    li.append(a);
+    ul.append(li);
+
+    container.append(p);
+    container.append(ul);
 }
