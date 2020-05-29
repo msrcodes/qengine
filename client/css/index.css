@@ -1,8 +1,16 @@
+:root {
+    --h: 25vh;
+}
+
 .qnr-container {
     padding: 0 1rem 0 0;
 
-    height: 25vh;
+    height: var(--h);
     overflow-y: scroll;
+}
+
+.double-height {
+    height: calc(var(--h) * 2);
 }
 
 .qnr-container li {

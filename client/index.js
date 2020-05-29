@@ -12,6 +12,7 @@ function getHandles() {
     pageElements.questionnaireContainer = document.querySelector("#questionnaire-container");
     pageElements.questionnaireTemplate = document.querySelector("#questionnaire-template");
     pageElements.signOut = document.querySelector(".signOut");
+    pageElements.yourTitle = document.querySelector("#your-title");
 }
 
 async function createQuestionnaire() {
@@ -102,9 +103,17 @@ async function initPage(signedIn) {
     let authToken;
     if (signedIn) {
         authToken = AuthUtil.getAuthToken();
-        pageElements.signOut.classList.remove("hidden");
+        UIUtil.show(pageElements.signOut);
+        UIUtil.show(pageElements.questionnaireContainer);
+        UIUtil.show(pageElements.yourTitle);
+
+        pageElements.publicQnrs.classList.remove("double-height");
     } else {
-        pageElements.signOut.classList.add("hidden");
+        UIUtil.hide(pageElements.signOut);
+        UIUtil.hide(pageElements.questionnaireContainer);
+        UIUtil.hide(pageElements.yourTitle);
+
+        pageElements.publicQnrs.classList.add("double-height");
     }
 
     const info = await getQuestionnaireInfo(authToken);
