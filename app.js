@@ -82,6 +82,7 @@ async function getQuestionnaireInfo(req, res) {
     const ret = [];
     let i = 0;
     if (limit != null) {
+        response.sort(() => Math.random() - 0.5);
         for (const r of response) {
             if (r.owner === 'user') {
                 ret.push(r);
