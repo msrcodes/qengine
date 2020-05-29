@@ -65,6 +65,22 @@ function validateQuestion(question) {
         return {valid: false, reason: "Question must have ID", code: 400};
     }
 
+    // Validation rule 5 + 6
+    if (question.options != null) {
+        const temp = [];
+        for (const option of question.options) {
+            if (option === "") {
+                return {valid: false, reason: "No option may be empty.", code: 400};
+            }
+
+            if (temp.includes(option)) {
+                return {valid: false, reason: `Question options must be unique. Found duplicate option '${option}'`, code: 400};
+            }
+
+            temp.push(option);
+        }
+    }
+
     return {valid: true, code: 200};
 }
 
