@@ -173,6 +173,14 @@ async function updateQuestionnaire(name, questions, qnrId, userId) {
         questions
     };
 
+    if (questions.length === 0) {
+        return {valid: false, reason: "Questionnaire must have questions.", code: 400};
+    }
+
+    if (name === "Untitled Questionnaire") {
+        return {valid: false, reason: `Questionnaire name must be changed from the default '${name}'.`, code: 400};
+    }
+
     try {
         // if no matching questionnaire is found, return HTTP Not Found code
         if (await getQuestionnaire(qnrId) === undefined)
