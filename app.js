@@ -91,7 +91,7 @@ async function getQuestionnaireInfo(req, res) {
                     continue;
                 }
 
-                if (r.questions.length > 0) {
+                if (r.lock) {
                     ret.push(r);
                     i++;
                 }
