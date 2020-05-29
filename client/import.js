@@ -93,6 +93,7 @@ async function onPageLoad() {
     getHandles();
     addEventListeners();
     AuthUtil.onSignIn(showHideSignOut);
+    await showHideSignOut();
 }
 
 window.addEventListener('load', onPageLoad);
