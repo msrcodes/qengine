@@ -118,6 +118,22 @@ async function onPageLoad() {
     getHandles();
     addEventListeners();
 
+    const example = {
+        "name": "Placeholder Questionnaire",
+        "questions": [
+            {
+                "text": "What is your name?",
+                "type": "text"
+            },
+            {
+                "text": "Is this a good question?",
+                "type": "single-select",
+                "options": ["Yes", "No"]
+            }
+        ]
+    };
+    pageElements.jsonInput.placeholder = JSON.stringify(example, null, 4);
+
     AuthUtil.onSignIn(showHideSignOut);
     await showHideSignOut();
 }

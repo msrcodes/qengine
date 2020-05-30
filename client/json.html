@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QEngine</title>
+    <link rel="stylesheet" href="css/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="import.js" type="module"></script>
+</head>
+<body>
+<header id="top">
+    <a href="/"><h1>QEngine</h1></a>
+    <div class="g-signin2"></div>
+    <a href="#" class="signOut">Sign out</a>
+</header>
+<main>
+    <a href="/import"><button>Back to import</button></a>
+    <h2>JSON File Specification</h2>
+    <p>In QEngine, questionnaires are interpreted as JSON objects. As such, in addition to the GUI editor you are able to
+        <a href="/import">write and import</a> JSON files that can then be interpreted into questionnaires.</p>
+    <section id="toc">
+        <h3>Table of Contents</h3>
+        <ol>
+            <li><a href="#required">Required Fields</a></li>
+            <li><a href="#question">Question Objects</a></li>
+            <li><a href="#ids">IDs</a></li>
+            <li><a href="#opt">Optional Fields</a></li>
+        </ol>
+    </section>
+    <section id="required">
+        <h3>Required Fields</h3>
+        <p><em>name</em>: A text string, the title of the questionnaire.</p>
+        <p><em>questions</em>: An array, containing zero or more valid <a href="#question">question objects</a>.</p>
+        <h4><label for="minimal">Minimal Questionnaire structure</label></h4>
+        <textarea id="minimal" cols="38" rows="4">
+  {
+      "name": "Minimal Questionnaire",
+      "questions": []
+  }</textarea>
+        <a href="#top">Return to top</a>
+    </section>
+    <section id="question">
+        <h3>Question Objects</h3>
+        <p>Each question in the questionnaire is represented as a JSON object.</p>
+        <h4>Required Fields</h4>
+        <p><em>text</em>: A string, the text content of the question. Must be fewer than 256 characters.</p>
+        <p><em>type</em>: A string id denoting the type of the question. Valid strings are "text", "number", "single-select" and "multi-select".</p>
+        <p><em>options</em>: Required only for "single-select" and "multi-select" questions. An array, containing one to ten (inclusive) unique non-empty strings to be displayed as the choices in the question. Each option must be fewer than 256 characters.</p>
+        <h4><label for="q-examples">Example Questionnaire with one of each question type</label></h4>
+        <textarea id="q-examples" cols="38" rows="33">
+  {
+      "name": "Test Questionnaire",
+      "questions": [
+            {
+                "text": "What is your name?",
+                "type": "text"
+            },
+            {
+                "text": "What is your age?",
+                "type": "number"
+            },
+            {
+                "text": "Of the options, which is your favourite colour?",
+                "type": "single-select",
+                "options": [
+                    "red",
+                    "blue",
+                    "green",
+                    "yellow"
+                ]
+            },
+            {
+                "text": "Which of the following pets do you have?",
+                "type": "multi-select",
+                "options": [
+                    "cat",
+                    "dog",
+                    "bird",
+                    "fish"
+                ]
+            }
+      ]
+  }</textarea>
+        <a href="#top">Return to top</a>
+    </section>
+    <section id="ids">
+        <h3>IDs</h3>
+        <p>A questionnaire or question that does not have a defined <em>id</em> field will instead be given a <a
+                href="https://www.webopedia.com/TERM/U/UUID.html">UUID</a>, generated on creation.</p>
+        <p>However, each questionnaire or <a href="#question">question object</a> may be given a id value - a non-empty string used to identify itself. For questionnaires, no two questionnaires may have the same ID. For questions, no two questions on your questionnaire may have the same ID but two questions from two different questionnaires can have the same ID.</p>
+        <h4><label for="id-example">Example Questionnaire with IDs</label></h4>
+        <textarea id="id-example" cols="38" rows="11">
+  {
+      "name": "Questionnaire with IDs",
+      "id": "test",
+      "questions": [
+            {
+                "id": "name",
+                "text": "What is your name?",
+                "type": "text"
+            }
+      ]
+  }</textarea>
+        <a href="#top">Return to top</a>
+    </section>
+    <section id="opt">
+        <h3>Optional Fields</h3>
+        <p>Each question may have the following optional fields:</p>
+        <p><em>required</em>: A boolean value, denoting whether the respondent is required to answer the question. By default, this value is true. (i.e. if you omit this field, the respondent is required to answer the question)</p>
+        <a href="#top">Return to top</a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,7 +1,5 @@
 'use strict';
 
-const questionnaires = require("./questionnaires");
-
 const QUESTION_TYPES = {
     TEXT: {
         id: "text",
