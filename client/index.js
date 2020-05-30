@@ -11,8 +11,8 @@ function getHandles() {
     pageElements.publicQnrs = document.querySelector("#public-questionnaire-container");
     pageElements.questionnaireContainer = document.querySelector("#questionnaire-container");
     pageElements.questionnaireTemplate = document.querySelector("#questionnaire-template");
+    pageElements.sectionUser = document.querySelector("#section-user");
     pageElements.signOut = document.querySelector(".signOut");
-    pageElements.yourTitle = document.querySelector("#your-title");
 }
 
 async function createQuestionnaire() {
@@ -105,13 +105,13 @@ async function initPage(signedIn) {
         authToken = AuthUtil.getAuthToken();
         UIUtil.show(pageElements.signOut);
         UIUtil.show(pageElements.questionnaireContainer);
-        UIUtil.show(pageElements.yourTitle);
+        UIUtil.show(pageElements.sectionUser);
 
         pageElements.publicQnrs.classList.remove("double-height");
     } else {
         UIUtil.hide(pageElements.signOut);
         UIUtil.hide(pageElements.questionnaireContainer);
-        UIUtil.hide(pageElements.yourTitle);
+        UIUtil.hide(pageElements.sectionUser);
 
         pageElements.publicQnrs.classList.add("double-height");
     }
