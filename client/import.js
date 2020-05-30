@@ -2,7 +2,6 @@
 
 import * as AuthUtil from "./lib/auth";
 import * as UIUtil from "./lib/interface";
-import * as URLUtil from "./lib/url";
 
 const pageElements = {};
 
@@ -13,13 +12,13 @@ async function createFromJSON() {
     try {
         json = JSON.parse(text);
     } catch (e) {
-        pageElements.errorText.textContent = e;
+        pageElements.importError.textContent = e;
         return;
     }
 
     pageElements.importBtn.disabled = "disabled";
-    pageElements.errorText.textContent = "";
-    pageElements.jsonInput.style.borderColor = ""; // TODO: use CSS classes
+    pageElements.importError.textContent = "";
+    pageElements.jsonInput.style.borderColor = "";
 
     let res;
     if (AuthUtil.isUserSignedIn()) {
@@ -59,24 +58,50 @@ async function createFromJSON() {
         const errorText = await res.text();
 
         if (errorText.includes("SyntaxError")) {
-            pageElements.errorText.textContent = "Malformed JSON.";
+            pageElements.importError.textContent = "Malformed JSON.";
         } else {
-            pageElements.errorText.textContent = errorText;
+            pageElements.importError.textContent = errorText;
         }
 
-        pageElements.jsonInput.style.borderColor = "red"; // TODO: use CSS classes
+        pageElements.jsonInput.style.borderColor = "red";
         pageElements.importBtn.disabled = "";
     }
 }
 
+function loadFromFile(e) {
+    pageElements.fileError.textContent = '';
+    const file = e.target.files[0];
+
+    if (file.type !== "application/json") {
+        pageElements.fileError.textContent = `Please upload a JSON file. Expected 'application/json', found ${file.type}`;
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const json = JSON.parse(e.target.result);
+            pageElements.jsonInput.textContent = JSON.stringify(json, null, 4);
+        } catch (e) {
+            pageElements.fileError.textContent = `${e}, fix the error and then try uploading again.`;
+        }
+
+        pageElements.fileInput.value = '';
+    };
+    reader.readAsText(file);
+}
+
 function addEventListeners() {
+    pageElements.fileInput.addEventListener('change', loadFromFile);
     pageElements.importBtn.addEventListener('click', createFromJSON);
 }
 
 function getHandles() {
-    pageElements.errorText = document.querySelector("#error-text");
+    pageElements.fileError = document.querySelector("#file-error");
+    pageElements.fileInput = document.querySelector("#file-input");
     pageElements.jsonInput = document.querySelector("#json-input");
     pageElements.importBtn = document.querySelector("#import-btn");
+    pageElements.importError = document.querySelector("#import-error");
     pageElements.signOut = document.querySelector(".signOut");
 }
 
@@ -92,6 +117,7 @@ async function onPageLoad() {
     AuthUtil.init();
     getHandles();
     addEventListeners();
+
     AuthUtil.onSignIn(showHideSignOut);
     await showHideSignOut();
 }

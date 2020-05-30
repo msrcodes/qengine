@@ -11,17 +11,27 @@
 </head>
 <body>
 <header>
-    <a href="/"><h1>QEngine - Import</h1></a>
+    <a href="/"><h1>QEngine</h1></a>
     <div class="g-signin2"></div>
     <a href="#" class="signOut">Sign out</a>
 </header>
 <main>
     <a href="/"><button>Back to home</button></a>
-    <p id="error-text" class="error"></p>
-    <h2><label for="json-input">Input JSON</label></h2>
-    <textarea name="json-input" id="json-input" cols="75" rows="30"></textarea>
-    <!--NB: autocomplete off fixes bug 654072 in Firefox. all other browsers don't require this functionality -->
-    <button id="import-btn" autocomplete="off">Import</button>
+    <h2>Import from a JSON file</h2>
+    <section>
+        <h3>Upload a JSON file</h3>
+        <p>Upload a JSON file from your device below.</p>
+        <p id="file-error" class="error"></p>
+        <input id="file-input" type="file" accept="text/json,.json">
+    </section>
+    <section>
+        <h3><label for="json-input">Manual Import</label></h3>
+        <p>Paste the contents of your JSON file below. Once complete, press "import" to create your questionnaire.</p>
+        <p id="import-error" class="error"></p>
+        <textarea name="json-input" id="json-input" cols="75" rows="30"></textarea>
+        <!--NB: autocomplete off fixes bug 654072 in Firefox. all other browsers don't require this functionality -->
+        <button id="import-btn" autocomplete="off">Import</button>
+    </section>
 </main>
 </body>
 </html>
