@@ -118,9 +118,9 @@ function displayQuestion(question) {
 
 function displayQuestionnaire(obj) {
     pageElements.qnrName.textContent = obj.name;
+    document.title = obj.name;
 
     for (const question of obj.questions) {
-        console.log(question);
         displayQuestion(question);
     }
 
