@@ -173,13 +173,20 @@ function displayQuestion(question = {text: "", type: "text"}) {
     pageElements.questions.append(clone);
 }
 
-async function displayQuestionnaire() {
+async function displayQuestionnaire(questionnaire) {
+    // async cannot be used in default parameters, so check if a questionnaire has been passed as a parameter
+    let qnr;
+    if (questionnaire == null) {
+        qnr = await getQuestionnaire();
+    } else {
+        qnr = questionnaire;
+    }
+
     if (URLUtil.getQuestionnaireId() == null) {
         UIUtil.showError("No questionnaire to display, please specify id.");
         return;
     }
 
-    const qnr = await getQuestionnaire();
     if (qnr == null) {
         UIUtil.showError("Failed to load questionnaire");
         return;
@@ -200,8 +207,30 @@ async function displayQuestionnaire() {
     pageElements.responsesLink.href = URLUtil.getURL("responses", URLUtil.getQuestionnaireId());
 }
 
+async function loadFromLocalStorage() {
+    const save = localStorage.getItem("qengine-autosave");
+
+    if (save != null) {
+        const data = JSON.parse(save);
+
+        if (data.id === URLUtil.getQuestionnaireId()) {
+            await displayQuestionnaire(data);
+        }
+    }
+}
+
+async function saveToLocalStorage() {
+    const data = await getFormData();
+    data.time = Date.now();
+    localStorage.setItem("qengine-autosave", JSON.stringify(data));
+
+    const date = new Date(data.time);
+    pageElements.autosaveTimer.textContent = date.toLocaleString();
+}
+
 function addEventListeners() {
     pageElements.addQuestion.addEventListener("click", () => displayQuestion());
+    pageElements.autosaveRestore.addEventListener('click', loadFromLocalStorage);
     pageElements.copy.addEventListener('click', e => copyToClipboard(e));
     pageElements.delete.addEventListener('click', deleteQuestionnaire);
     pageElements.save.addEventListener('click', updateQuestionnaire);
@@ -209,6 +238,8 @@ function addEventListeners() {
 
 function getHandles() {
     pageElements.addQuestion = document.querySelector("#add-question");
+    pageElements.autosaveRestore = document.querySelector("#autosave-now");
+    pageElements.autosaveTimer = document.querySelector("#autosave-time");
     pageElements.copy = document.querySelector("#copy-respond-btn");
     pageElements.delete = document.querySelector("#btn-delete-questionnaire");
     pageElements.error = document.querySelector("#error");
@@ -220,6 +251,20 @@ function getHandles() {
     pageElements.responsesLink = document.querySelector("#responses-link");
     pageElements.save = document.querySelector("#update");
     pageElements.signOut = document.querySelector(".signOut");
+}
+
+async function initAutosave() {
+    const save = localStorage.getItem("qengine-autosave");
+
+    if (save != null) {
+        const data = JSON.parse(save);
+        if (data.id === URLUtil.getQuestionnaireId()) {
+            const date = new Date(data.time);
+            pageElements.autosaveTimer.textContent = date.toLocaleString();
+        }
+    }
+
+    setInterval(await saveToLocalStorage, 1000 * 30);
 }
 
 async function checkAuth() {
@@ -281,9 +326,9 @@ async function checkAuth() {
 
 async function reload() {
     if (AuthUtil.isUserSignedIn()) {
-        pageElements.signOut.classList.remove("hidden");
+        UIUtil.show(pageElements.signOut);
     } else {
-        pageElements.signOut.classList.add("hidden");
+        UIUtil.hide(pageElements.signOut);
     }
 
     if (!await checkAuth()) {
@@ -301,6 +346,7 @@ async function onPageLoad() {
 
     AuthUtil.onSignIn(reload); // Re-load if user signs in
     await reload(); // Check auth on page load; user can edit public if not signed in
+    await initAutosave();
 }
 
 window.addEventListener('load', onPageLoad);
