@@ -8,6 +8,8 @@ const pageElements = {};
 
 function getHandles() {
     pageElements.createBtn = document.querySelector("#create");
+    pageElements.createInfo = document.querySelector("#create-info");
+    pageElements.errorText = document.querySelector(".error");
     pageElements.publicQnrs = document.querySelector("#public-questionnaire-container");
     pageElements.questionnaireContainer = document.querySelector("#questionnaire-container");
     pageElements.questionnaireTemplate = document.querySelector("#questionnaire-template");
@@ -38,7 +40,7 @@ async function createQuestionnaire() {
         const id = await res.json();
         window.location = URLUtil.getURL("edit", id);
     } else {
-        console.error(res.statusText); // todo: proper error handling
+        pageElements.errorText.textContent = await res.text();
     }
 }
 
@@ -107,12 +109,14 @@ async function initPage(signedIn) {
         UIUtil.show(pageElements.questionnaireContainer);
         UIUtil.show(pageElements.sectionUser);
 
+        pageElements.createInfo.textContent = "You are currently logged in. As such, anyone will be able to respond to your questionnaire but only you will be able to edit it and view the responses to it.";
         pageElements.publicQnrs.classList.remove("double-height");
     } else {
         UIUtil.hide(pageElements.signOut);
         UIUtil.hide(pageElements.questionnaireContainer);
         UIUtil.hide(pageElements.sectionUser);
 
+        pageElements.createInfo.textContent = "You are currently not logged in. As such, anyone will be able to respond to your questionnaire and view the responses to it but you will not be able to edit it once it has been published.";
         pageElements.publicQnrs.classList.add("double-height");
     }
 
@@ -123,7 +127,7 @@ async function initPage(signedIn) {
         }
     } else {
         const elem = document.createElement("p");
-        elem.append(document.createTextNode("An unexpected error occurred.")); // TODO: refresh?
+        elem.append(document.createTextNode("An unexpected error occurred."));
         pageElements.questionnaireContainer.append(elem);
     }
 
