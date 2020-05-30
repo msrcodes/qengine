@@ -25,6 +25,7 @@ function getFormData() {
 
         question.text = fieldset.querySelector("legend input").value;
         question.type = fieldset.querySelector("select").value;
+        question.required = fieldset.querySelector(".input-required").checked;
 
         if (question.type === "single-select" || question.type === "multi-select") {
             question.options = [];
@@ -148,6 +149,10 @@ function displayQuestion(question = {text: "", type: "text"}) {
     clone.querySelector("fieldset").dataset.id = question.id;
 
     clone.querySelector("input").value = question.text;
+
+    if (question.required != null) {
+        clone.querySelector(".input-required").checked = question.required;
+    }
 
     const select = clone.querySelector("select");
     select.value = question.type;
