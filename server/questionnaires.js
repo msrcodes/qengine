@@ -146,7 +146,7 @@ async function addQuestionnaire(name, questions, id, userId) {
 
     const qnr = {name: name, questions: qnrQs};
 
-    for (const question of questions) {
+    for (const question of qnr.questions) {
         if (question.id == null) {
             question.id = uuid();
         }
