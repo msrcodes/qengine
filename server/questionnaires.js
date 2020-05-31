@@ -60,11 +60,16 @@ async function getQuestionnaire(id) {
     try {
         const con = await db.dbConn;
         const qnr = await con.get(`SELECT name, questions FROM Questionnaires WHERE id = ?`, id);
+
+        if (qnr == null) {
+            return {valid: false, code: 404, error: `Could not find questionnaire with id '${id}'`};
+        }
+
         qnr.questions = JSON.parse(qnr.questions);
 
         return qnr;
     } catch (e) {
-        return {code: 400, error: e};
+        return {valid: false, code: 400, error: e};
     }
 }
 
@@ -124,12 +129,15 @@ async function addQuestionnaire(name, questions, id, userId) {
     }
 
     // if an id is defined, and a questionnaire already exists with that id, return HTTP bad request error code
-    if (id !== undefined && await getQuestionnaire(id) !== undefined) {
-        return {
-            valid: false,
-            reason: `Questionnaire already exists with id '${id}'`,
-            code: 400
-        };
+    if (id != null) {
+        const qnr = await getQuestionnaire(id);
+        if (qnr.valid !== false) {
+            return {
+                valid: false,
+                reason: `Questionnaire already exists with id '${id}'`,
+                code: 400
+            };
+        }
     }
 
     // if optional parameter values are not defined, generate default values instead
