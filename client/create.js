@@ -1,9 +1,7 @@
 import * as Editor from "./lib/editor";
-import * as AuthUtil from "./lib/auth";
 
 async function onPageLoad() {
-    AuthUtil.init();
-    await Editor.init({mode: "edit"});
+    await Editor.init({mode: "create"});
 }
 
 window.addEventListener('load', onPageLoad);

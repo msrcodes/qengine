@@ -140,11 +140,15 @@ async function addQuestionnaire(name, questions, id, userId) {
         }
     }
 
-    // if optional parameter values are not defined, generate default values instead
-    const qnrId = id === undefined ? uuid() : id;
-    const qnrQs = questions === undefined ? [] : questions;
+    // if no questions are given
+    if (questions == null || questions.length === 0) {
+        return {valid: false, reason: "Questionnaire must have one or more questions.", code: 400};
+    }
 
-    const qnr = {name: name, questions: qnrQs};
+    // if optional parameter values are not defined, generate default values instead
+    const qnrId = id == null ? uuid() : id;
+
+    const qnr = {name: name, questions: questions};
 
     for (const question of qnr.questions) {
         if (question.id == null) {
@@ -160,7 +164,7 @@ async function addQuestionnaire(name, questions, id, userId) {
     // add questionnaire to storage
     try {
         const con = await db.dbConn;
-        con.run('INSERT INTO Questionnaires (id, name, questions) VALUES (?, ?, ?)', qnrId, name, JSON.stringify(qnrQs));
+        con.run('INSERT INTO Questionnaires (id, name, questions) VALUES (?, ?, ?)', qnrId, name, JSON.stringify(questions));
 
         // assign to correct user
         if (userId == null) {

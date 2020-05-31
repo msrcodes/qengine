@@ -71,8 +71,8 @@ function validateQuestion(question) {
         }
 
         for (const option of question.options) {
-            if (option === "") {
-                return {valid: false, reason: "No option may be empty.", code: 400};
+            if (option.replace(/\s/g, '') === "") {
+                return {valid: false, reason: "Options must not have empty text or contain only spaces.", code: 400};
             }
 
             if (temp.includes(option)) {
@@ -87,9 +87,14 @@ function validateQuestion(question) {
         }
     }
 
-    // Validation 8
+    // Validation rule 8
     if (question.text.length > 256) {
         return {valid: false, reason: `Questions must be fewer than 256 characters. Question '${question.text}' is longer than 256 characters`, code: 400};
+    }
+
+    // Validation rule 9
+    if (question.text.replace(/\s/g, '') === '') {
+        return {valid: false, reason: "Questions must not have empty titles or contain only spaces.", code: 400};
     }
 
     return {valid: true, code: 200};

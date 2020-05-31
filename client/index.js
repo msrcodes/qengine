@@ -7,7 +7,6 @@ import * as URLUtil from "./lib/url";
 const pageElements = {};
 
 function getHandles() {
-    pageElements.createBtn = document.querySelector("#create");
     pageElements.createInfo = document.querySelector("#create-info");
     pageElements.errorText = document.querySelector(".error");
     pageElements.publicQnrs = document.querySelector("#public-questionnaire-container");
@@ -15,37 +14,6 @@ function getHandles() {
     pageElements.questionnaireTemplate = document.querySelector("#questionnaire-template");
     pageElements.sectionUser = document.querySelector("#section-user");
     pageElements.signOut = document.querySelector(".signOut");
-}
-
-async function createQuestionnaire() {
-    let res;
-    if (AuthUtil.isUserSignedIn()) {
-        res = await fetch ("/questionnaires", {
-            method: "POST",
-            body: JSON.stringify({
-                name: "Untitled Questionnaire",
-                token: AuthUtil.getAuthToken(),
-            }),
-            headers: {'Content-Type': 'application/json'}
-        });
-    } else {
-        res = await fetch ("/questionnaires", {
-            method: "POST",
-            body: JSON.stringify({name: "Untitled Questionnaire"}),
-            headers: {'Content-Type': 'application/json'}
-        });
-    }
-
-    if (res.ok) {
-        const id = await res.json();
-        window.location = URLUtil.getURL("edit", id);
-    } else {
-        pageElements.errorText.textContent = await res.text();
-    }
-}
-
-function addEventListeners() {
-    pageElements.createBtn.addEventListener('click', createQuestionnaire);
 }
 
 function toggleLoadText() {
@@ -137,7 +105,6 @@ async function initPage(signedIn) {
 async function onPageLoad() {
     AuthUtil.init();
     getHandles();
-    addEventListeners();
 
     AuthUtil.onSignIn(initPage);
     await initPage(false);

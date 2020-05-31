@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QEngine</title>
+    <link rel="stylesheet" href="css/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="669662674922-5ttb2672udcvvnfk4mnfm2h6hu4350uu.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="create.js" type="module"></script>
+</head>
+<body>
+    <header>
+        <a href="/"><h1>QEngine</h1></a>
+        <div class="g-signin2"></div>
+        <a href="#" class="signOut">Sign out</a>
+    </header>
+    <main class="hidden">
+        <p><a href="/"><button>Back to home</button></a></p>
+        <section>
+            <h3>Autosave</h3>
+            <p><em>Last autosaved: </em><span id="autosave-time">never</span> <button id="autosave-now">Restore</button></p>
+            <p>Note that autosaved changes are stored locally and are not published. To publish your changes, you will need to publish.</p>
+        </section>
+        <section>
+            <h2>Edit Questionnaire</h2>
+            <label for="questionnaire-name">Questionnaire Title:</label>
+            <input id="questionnaire-name" type="text"/>
+            <button id="btn-delete-questionnaire">Delete questionnaire</button>
+            <a href="" id="responses-link"><button>View Responses</button></a>
+            <p id="error" class="error"></p>
+            <div id="questions">
+
+            </div>
+            <button id="add-question">Add question</button>
+            <button id="update">Publish Questionnaire</button>
+        </section>
+        <section id="share">
+            <h3>Share this questionnaire</h3>
+            <span>This questionnaire is available here: <a href="" id="questionnaire-link"></a> <button id="copy-respond-btn">Copy to clipboard</button></span>
+        </section>
+    </main>
+
+    <template id="template-question">
+        <fieldset>
+            <legend class="legend-edit">
+                <label>Question title:
+                    <input type="text">
+                </label>
+            </legend>
+            <label>
+                Question type:
+                <select>
+                    <option value="text">text</option>
+                    <option value="number">number</option>
+                    <option value="single-select">single-select</option>
+                    <option value="multi-select">multi-select</option>
+                </select>
+            </label>
+            <label>
+                Required:
+                <input class="input-required" type="checkbox" checked>
+            </label>
+            <ol class="hidden">
+
+            </ol>
+            <button class="add-option hidden">Add Option</button>
+            <button class="delete">Delete Question</button>
+        </fieldset>
+    </template>
+    <template id="template-option">
+        <li>
+            <label>
+                <input type="text">
+            </label>
+            <button>Remove Option</button>
+        </li>
+    </template>
+</body>
+</html>
