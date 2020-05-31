@@ -6,4 +6,4 @@ async function onPageLoad() {
     await Editor.init({mode: "edit"});
 }
 
-window.addEventListener('load', onPageLoad);
+gapi.load('auth2', onPageLoad);

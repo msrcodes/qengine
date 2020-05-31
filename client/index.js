@@ -16,18 +16,6 @@ function getHandles() {
     pageElements.signOut = document.querySelector(".signOut");
 }
 
-function toggleLoadText() {
-    const loadText = pageElements.questionnaireContainer.querySelector(".loadingText");
-    if (loadText == null) {
-        const elem = document.createElement("p");
-        elem.append(document.createTextNode("Loading, please wait..."));
-        elem.classList.add("loadingText");
-        pageElements.questionnaireContainer.append(elem);
-    } else {
-        loadText.remove();
-    }
-}
-
 function clearTemplate() {
     UIUtil.removeChildren(pageElements.questionnaireContainer);
     UIUtil.removeChildren(pageElements.publicQnrs);
@@ -67,8 +55,8 @@ async function getQuestionnaireInfo(authToken) {
 }
 
 async function initPage(signedIn) {
+    UIUtil.showLoadText();
     clearTemplate();
-    toggleLoadText();
 
     let authToken;
     if (signedIn) {
@@ -99,15 +87,16 @@ async function initPage(signedIn) {
         pageElements.questionnaireContainer.append(elem);
     }
 
-    toggleLoadText();
+    UIUtil.hideLoadText();
 }
 
 async function onPageLoad() {
     AuthUtil.init();
-    getHandles();
-
-    await initPage(false);
     AuthUtil.onSignIn(initPage);
+
+    getHandles();
+    await initPage(AuthUtil.isUserSignedIn());
 }
 
-window.addEventListener('load', onPageLoad);
+// Load page once auth has loaded, prevents race conditions.
+gapi.load('auth2', onPageLoad);

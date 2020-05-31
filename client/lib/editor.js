@@ -366,6 +366,7 @@ async function checkAuth(mode) {
 }
 
 async function reload(options) {
+    UIUtil.showLoadText();
     if (AuthUtil.isUserSignedIn()) {
         UIUtil.show(pageElements.signOut);
     } else {
@@ -377,6 +378,7 @@ async function reload(options) {
     }
 
     await displayQuestionnaire(await getQuestionnaire(options), options);
+    UIUtil.hideLoadText();
 }
 
 function initInterface(options) {

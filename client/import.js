@@ -138,4 +138,4 @@ async function onPageLoad() {
     AuthUtil.onSignIn(showHideSignOut);
 }
 
-window.addEventListener('load', onPageLoad);
+gapi.load('auth2', onPageLoad);

@@ -71,7 +71,6 @@ function addGraph(question) {
 async function displayResponses(qnr) {
     UIUtil.clearError();
     UIUtil.removeChildren(pageElements.responsesContainer);
-    UIUtil.showError("Loading...");
 
     // Retrieve questionnaire from local storage
     if (qnr == null) {
@@ -230,6 +229,7 @@ async function checkAuth() {
 }
 
 async function reload() {
+    UIUtil.showLoadText();
     if (AuthUtil.isUserSignedIn()) {
         pageElements.signOut.classList.remove("hidden");
     } else {
@@ -243,6 +243,7 @@ async function reload() {
     const qnr = await getQuestionnaire();
 
     await displayResponses(qnr);
+    UIUtil.hideLoadText();
 }
 
 async function onPageLoad() {
@@ -255,4 +256,4 @@ async function onPageLoad() {
     AuthUtil.onSignIn(reload); // Re-load if user signs in
 }
 
-window.addEventListener('load', onPageLoad);
+gapi.load('auth2', onPageLoad);

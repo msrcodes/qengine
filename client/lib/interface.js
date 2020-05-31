@@ -37,6 +37,20 @@ export function showError(message) {
     document.querySelector("body").append(elem);
 }
 
+export function hideLoadText() {
+    const loadText = document.querySelectorAll(".loadText");
+    for (const text of loadText) {
+        hide(text);
+    }
+}
+
+export function showLoadText() {
+    const loadText = document.querySelectorAll(".loadText");
+    for (const text of loadText) {
+        show(text);
+    }
+}
+
 export function showOptionsMenu(menu, message, container, id) {
     const p = document.createElement("p");
     p.append(document.createTextNode(message));
