@@ -77,7 +77,7 @@ main {
     padding: var(--padding);
 }
 
-main > section {
+section {
     padding: 1em;
     margin: 2em 0;
     background-color: rgba(191, 213, 241, 0.3);

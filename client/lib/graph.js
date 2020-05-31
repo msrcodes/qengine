@@ -44,6 +44,7 @@ export class Graph extends HTMLElement {
     draw(spacing = 10) {
         const data = JSON.parse(this.getAttribute("data-value"));
         const canvas = this.shadow.querySelector("canvas");
+        canvas.draggable = true;
 
         if (this.hasAttribute("data-title")) {
             this.shadow.querySelector("h3").textContent = this.getAttribute("data-title");
