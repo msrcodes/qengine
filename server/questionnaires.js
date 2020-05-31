@@ -138,6 +138,12 @@ async function addQuestionnaire(name, questions, id, userId) {
 
     const qnr = {name: name, questions: qnrQs};
 
+    for (const question of questions) {
+        if (question.id == null) {
+            question.id = uuid();
+        }
+    }
+
     const res = validateLib.validateQuestionnaire(qnr);
     if (!res.valid) {
         return res;
