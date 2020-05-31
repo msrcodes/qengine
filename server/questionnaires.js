@@ -38,10 +38,6 @@ async function getQuestionnaireInfo(userId) {
 
             if (qnr.user_id === '_______________PUBLIC') {
                 qnr.owner = 'public';
-
-                if (qnr.questions.length > 0) {
-                    qnr.lock = true;
-                }
             } else {
                 qnr.owner = 'user';
             }
@@ -84,8 +80,8 @@ async function checkUserAccess(qnrId, userId, edit = false) {
     }
 
     if (edit && ret != null) {
-        if (ret.owner === "public" && ret.lock === true) {
-            return {valid: false, reason: "User cannot access this questionnaire", code: 401};
+        if (ret.owner === "public") {
+            return {valid: false, reason: "Public questionnaires cannot be edited once published.", code: 401};
         }
     } else if (ret == null) {
         return {valid: false, reason: `Could not find questionnaire for user ${userId} with id ${qnrId}`, code: 404};
