@@ -134,8 +134,8 @@ async function onPageLoad() {
     };
     pageElements.jsonInput.placeholder = JSON.stringify(example, null, 4);
 
-    AuthUtil.onSignIn(showHideSignOut);
     await showHideSignOut();
+    AuthUtil.onSignIn(showHideSignOut);
 }
 
 window.addEventListener('load', onPageLoad);

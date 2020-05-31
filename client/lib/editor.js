@@ -392,11 +392,11 @@ async function init(options) {
     getHandles();
     addEventListeners(options);
 
-    AuthUtil.onSignIn(() => reload(options));
     initInterface(options);
-
     await reload(options);
+
     await initAutosave();
+    AuthUtil.onSignIn(() => reload(options));
 }
 
 export {

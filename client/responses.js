@@ -251,8 +251,8 @@ async function onPageLoad() {
     getHandles();
     addEventListeners();
 
-    AuthUtil.onSignIn(reload); // Re-load if user signs in
     await reload(); // Check auth on page load; user can edit public if not signed in
+    AuthUtil.onSignIn(reload); // Re-load if user signs in
 }
 
 window.addEventListener('load', onPageLoad);

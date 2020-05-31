@@ -22,8 +22,8 @@ async function onPageLoad() {
 
     getHandles();
 
-    AuthUtil.onSignIn(showHideSignOut);
     await showHideSignOut();
+    AuthUtil.onSignIn(showHideSignOut);
 }
 
 window.addEventListener('load', onPageLoad);

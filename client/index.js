@@ -106,8 +106,8 @@ async function onPageLoad() {
     AuthUtil.init();
     getHandles();
 
-    AuthUtil.onSignIn(initPage);
     await initPage(false);
+    AuthUtil.onSignIn(initPage);
 }
 
 window.addEventListener('load', onPageLoad);
