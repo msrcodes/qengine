@@ -46,7 +46,7 @@ async function createFromJSON() {
         const main = document.querySelector("main");
         UIUtil.removeChildren(main);
 
-        let menu = [
+        const menu = [
             {url: "responses", text: "View Responses"},
             {url: "respond", text: "Respond to this questionnaire"},
             {url: "edit", text: "Edit this questionnaire"}

@@ -99,7 +99,21 @@ async function publishQuestionnaire(options) {
         let id;
         if (options.mode === 'create') {
             id = await response.json();
-            window.location = `${URLUtil.getURL("edit", id)}&display=published`;
+
+            if (AuthUtil.isUserSignedIn()) {
+                window.location = `${URLUtil.getURL("edit", id)}&display=published`;
+            } else {
+                const main = document.querySelector("main");
+
+                UIUtil.removeChildren(main);
+                const menu = [
+                    {url: "responses", text: "View Responses"},
+                    {url: "respond", text: "Respond to this questionnaire"}
+                ];
+                const message = `Your questionnaire with ID '${id}' has been published.`;
+
+                UIUtil.showOptionsMenu(menu, message, main, id);
+            }
         } else {
             pageElements.display.textContent = 'Successfully edited.';
             pageElements.display.scrollIntoView();
