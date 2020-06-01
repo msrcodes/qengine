@@ -121,17 +121,14 @@ fieldset {
     }
 
     header {
-        grid-template-rows: auto;
+        display: grid;
+        grid-template-rows: auto auto;
         grid-template-columns: 1fr 1fr;
-        grid-template-areas: "a a" "b c";
+        grid-template-areas: "header header" "in out";
     }
 
-    header h1 {
-        grid-area: a;
-        justify-self: center;
-    }
-
-    header > div, header > a {
+    header > a:not(.signOut) {
+        grid-area: header;
         justify-self: center;
     }
 }
