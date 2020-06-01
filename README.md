@@ -89,5 +89,10 @@ I had the choice to either break down question arrays and responses into databas
 
 The benefits of the former weren't there for me, so I opted for the simpler solution. Implementing the former would overcomplicate the system in an area that doesn't need to be overcomplicated, increasing maintainability.
 
+### Storing questionnaires that have no user in the database
+If a user is not logged in, the questionnaires act as if they have the owner `_______________PUBLIC`. Underscores are there for the 21 character enforced size (as normal user ids are 21 characters).
+
+This could have been achieved using a boolean flag, making the user id field nullable, or having a separate "these questionnaires have no owner" table but all of these would have complicated fetching and validation down the chain and ultimately, was not worth the time.
+
 ### Want extra test data?
 Use the examples in `json.html` (although any questionnaire by the specification provided should work).
