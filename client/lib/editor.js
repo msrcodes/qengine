@@ -308,6 +308,7 @@ function getHandles() {
     pageElements.checkDeleteLabel = document.querySelector("label[for='check-delete']");
     pageElements.copy = document.querySelector("#copy-respond-btn");
     pageElements.delete = document.querySelector("#btn-delete-questionnaire");
+    pageElements.deleteSection = document.querySelector("#delete-section");
     pageElements.error = document.querySelector("#error");
     pageElements.title = document.querySelector("#questionnaire-name");
     pageElements.templateOption = document.querySelector("#template-option");
@@ -402,7 +403,7 @@ async function reload(options) {
 function initInterface(options) {
     if (options.mode === 'create') {
         UIUtil.hide(pageElements.share);
-        UIUtil.hide(pageElements.delete);
+        UIUtil.hide(pageElements.deleteSection);
         UIUtil.hide(pageElements.responsesLink);
     }
 }
