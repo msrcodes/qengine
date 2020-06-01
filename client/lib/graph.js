@@ -13,7 +13,7 @@ export class Graph extends HTMLElement {
         const container = document.createElement("div");
 
         const canvas = document.createElement('canvas');
-        const heading = document.createElement("h3");
+        const heading = document.createElement("h5");
 
         const stylesheet = document.createElement('link');
         stylesheet.setAttribute('rel', 'stylesheet');
@@ -47,9 +47,9 @@ export class Graph extends HTMLElement {
         canvas.draggable = true;
 
         if (this.hasAttribute("data-title")) {
-            this.shadow.querySelector("h3").textContent = this.getAttribute("data-title");
+            this.shadow.querySelector("h5").textContent = this.getAttribute("data-title");
         } else {
-            this.shadow.querySelector("h3").textContent = "";
+            this.shadow.querySelector("h5").textContent = "";
         }
 
         if (canvas.getContext) {

@@ -158,7 +158,7 @@ async function displayResponses(qnr) {
     pageElements.name.textContent = qnr.name;
     for (const question of qnr.questions) {
         const clone = pageElements.templateResponse.content.cloneNode(true);
-        clone.querySelector("h3").textContent = question.text;
+        clone.querySelector("h4").textContent = question.text;
         clone.querySelector("ul").dataset.id = question.id;
 
         // Add counter for single-select or multi-select questions
