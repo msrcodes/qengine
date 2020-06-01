@@ -385,19 +385,23 @@ async function checkAuth(mode) {
 }
 
 async function reload(options) {
-    UIUtil.showLoadText();
+    UIUtil.showLoad();
+
+    UIUtil.setLoadProgress(0, "Checking sign in status");
     if (AuthUtil.isUserSignedIn()) {
         UIUtil.show(pageElements.signOut);
     } else {
         UIUtil.hide(pageElements.signOut);
     }
 
+    UIUtil.setLoadProgress(30, "Checking authentication");
     if (!await checkAuth(options.mode)) {
         return;
     }
 
+    UIUtil.setLoadProgress(80, "Displaying questionnaire");
     await displayQuestionnaire(await getQuestionnaire(options), options);
-    UIUtil.hideLoadText();
+    UIUtil.hideLoad();
 }
 
 function initInterface(options) {

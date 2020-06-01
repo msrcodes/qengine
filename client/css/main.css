@@ -119,6 +119,11 @@ fieldset {
     color: darkgreen;
 }
 
+#loadProgress {
+    width: 100%;
+    height: 2em;
+}
+
 @media (max-width: 520px) {
     :root {
         --padding: 1rem 1rem;

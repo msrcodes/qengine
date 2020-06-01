@@ -228,21 +228,30 @@ async function checkAuth() {
 }
 
 async function reload() {
-    UIUtil.showLoadText();
+    UIUtil.showLoad();
+    UIUtil.hide(document.querySelector("main"));
+
+    UIUtil.setLoadProgress(0, "Checking sign in status");
     if (AuthUtil.isUserSignedIn()) {
-        pageElements.signOut.classList.remove("hidden");
+        UIUtil.show(pageElements.signOut);
     } else {
-        pageElements.signOut.classList.add("hidden");
+        UIUtil.hide(pageElements.signOut);
     }
 
-    // if (!await checkAuth()) {
-    //     return;
-    // }
+    UIUtil.setLoadProgress(10, "Checking authentication");
+    if (!await checkAuth()) {
+        return;
+    }
 
+    UIUtil.setLoadProgress(30, "Fetching questionnaire");
     const qnr = await getQuestionnaire();
 
+    UIUtil.setLoadProgress(80, "Displaying questionnaire");
     await displayResponses(qnr);
-    UIUtil.hideLoadText();
+
+    UIUtil.setLoadProgress(100, "Complete!");
+    UIUtil.hideLoad();
+    UIUtil.show(document.querySelector("main"));
 }
 
 async function onPageLoad() {

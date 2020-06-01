@@ -37,18 +37,27 @@ export function showError(message) {
     document.querySelector("body").append(elem);
 }
 
-export function hideLoadText() {
+export function hideLoad() {
     const loadText = document.querySelectorAll(".loadText");
     for (const text of loadText) {
         hide(text);
     }
+
+    hide(document.querySelector("#load"));
 }
 
-export function showLoadText() {
+export function showLoad() {
     const loadText = document.querySelectorAll(".loadText");
     for (const text of loadText) {
         show(text);
     }
+
+    show(document.querySelector("#load"));
+}
+
+export function setLoadProgress(val, nextTask) {
+    document.querySelector("#loadProgress").value = val;
+    document.querySelector("#loadLabel").textContent = `Current Task: ${nextTask}`;
 }
 
 export function showOptionsMenu(menu, message, container, id) {

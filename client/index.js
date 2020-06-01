@@ -61,9 +61,11 @@ async function getQuestionnaireInfo(authToken) {
 }
 
 async function initPage(signedIn) {
-    UIUtil.showLoadText();
+    UIUtil.showLoad();
+    UIUtil.hide(document.querySelector("main"));
     clearTemplate();
 
+    UIUtil.setLoadProgress(0, "Checking authentication");
     let authToken;
     if (signedIn) {
         authToken = AuthUtil.getAuthToken();
@@ -82,7 +84,10 @@ async function initPage(signedIn) {
         pageElements.publicQnrs.classList.add("double-height");
     }
 
+    UIUtil.setLoadProgress(20, "Fetching questionnaire information");
     const info = await getQuestionnaireInfo(authToken);
+
+    UIUtil.setLoadProgress(80, "Displaying information");
     if (info != null) {
         for (const obj of info) {
             populateTemplate(obj);
@@ -93,7 +98,9 @@ async function initPage(signedIn) {
         pageElements.questionnaireContainer.append(elem);
     }
 
-    UIUtil.hideLoadText();
+    UIUtil.setLoadProgress(100, "Complete!");
+    UIUtil.hideLoad();
+    UIUtil.show(document.querySelector("main"));
 }
 
 async function onPageLoad() {
