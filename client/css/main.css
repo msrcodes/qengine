@@ -115,6 +115,10 @@ fieldset {
     column-gap: 1rem;
 }
 
+.success {
+    color: darkgreen;
+}
+
 @media (max-width: 520px) {
     :root {
         --padding: 1rem 1rem;

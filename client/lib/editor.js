@@ -84,6 +84,7 @@ async function createQuestionnaire() {
 async function publishQuestionnaire(options) {
     // Auto-save in the event of an error
     await saveToLocalStorage();
+    pageElements.error.textContent = '';
 
     // Send request to server to create/update the questionnaire
     let response;
@@ -98,20 +99,12 @@ async function publishQuestionnaire(options) {
         let id;
         if (options.mode === 'create') {
             id = await response.json();
+            window.location = `${URLUtil.getURL("edit", id)}&display=published`;
         } else {
-            id = URLUtil.getQuestionnaireId();
+            pageElements.display.textContent = 'Successfully edited.';
+            pageElements.display.scrollIntoView();
+            window.setTimeout(() => pageElements.display.textContent = '', 10 * 1000);
         }
-
-        const main = document.querySelector("main");
-        UIUtil.removeChildren(main);
-
-        let menu = [
-            {url: "responses", text: "View Responses"},
-            {url: "respond", text: "Respond to this questionnaire"},
-            {url: "edit", text: "Edit this questionnaire again"}
-        ];
-
-        UIUtil.showOptionsMenu(menu, "Successfully edited.", main, id);
     } else {
         pageElements.error.textContent = await response.text();
     }
@@ -266,6 +259,12 @@ async function displayQuestionnaire(questionnaire, options) {
         displayQuestion(question);
     }
 
+    // add default question if there isn't already one
+    if (questionnaire.questions.length === 0) {
+        displayQuestion();
+    }
+
+    // if editing, show publish link
     if (options.mode !== 'create') {
         displayRespondLink();
     }
@@ -309,6 +308,7 @@ function getHandles() {
     pageElements.copy = document.querySelector("#copy-respond-btn");
     pageElements.delete = document.querySelector("#btn-delete-questionnaire");
     pageElements.deleteSection = document.querySelector("#delete-section");
+    pageElements.display = document.querySelector("#display");
     pageElements.error = document.querySelector("#error");
     pageElements.title = document.querySelector("#questionnaire-name");
     pageElements.templateOption = document.querySelector("#template-option");
@@ -401,6 +401,14 @@ async function reload(options) {
 }
 
 function initInterface(options) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("display")) {
+        if (params.get("display") === 'published') {
+            pageElements.display.textContent = 'Successfully edited.';
+            window.setTimeout(() => pageElements.display.textContent = '', 10 * 1000);
+        }
+    }
+
     if (options.mode === 'create') {
         UIUtil.hide(pageElements.share);
         UIUtil.hide(pageElements.deleteSection);
