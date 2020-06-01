@@ -14,7 +14,8 @@ async function getQuestionnaires() {
         for (const qnr of qnrs) {
             ret[qnr.id] = {
                 name: qnr['name'],
-                questions: JSON.parse(qnr['questions'])
+                questions: JSON.parse(qnr['questions']),
+                visibility: qnr.visibility === 1
             };
         }
 
@@ -42,7 +43,7 @@ async function getQuestionnaireInfo(userId) {
         const publicQuestionnaires = await con.all(`
         SELECT id, name, visibility FROM Questionnaires 
         JOIN UsersQuestionnaires ON Questionnaires.id = UsersQuestionnaires.questionnaire_id 
-        WHERE UsersQuestionnaires.user_id != ? AND visibility = 1`, userId);
+        WHERE (UsersQuestionnaires.user_id != ? OR UsersQuestionnaires.user_id = '_______________PUBLIC') AND visibility = 1`, userId);
 
         for (const qnr of publicQuestionnaires) {
             // Convert binary value to boolean
