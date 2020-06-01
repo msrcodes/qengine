@@ -27,26 +27,31 @@ async function getQuestionnaires() {
 async function getQuestionnaireInfo(userId) {
     try {
         const con = await db.dbConn;
-        const info = await con.all(`
-        SELECT id, name, questions, user_id FROM Questionnaires 
+        const userQuestionnaires = await con.all(`
+        SELECT id, name, visibility FROM Questionnaires 
         JOIN UsersQuestionnaires ON Questionnaires.id = UsersQuestionnaires.questionnaire_id 
-        WHERE UsersQuestionnaires.user_id = '_______________PUBLIC' OR UsersQuestionnaires.user_id = ?`,
-            userId);
+        WHERE UsersQuestionnaires.user_id = ?`, userId);
 
-        for (const qnr of info) {
-            qnr.questions = JSON.parse(qnr.questions);
+        for (const qnr of userQuestionnaires) {
+            // Convert binary value to boolean
+            qnr.visibility = qnr.visibility === 1;
 
-            if (qnr.user_id === '_______________PUBLIC') {
-                qnr.owner = 'public';
-            } else {
-                qnr.owner = 'user';
-            }
-
-            delete qnr.user_id;
-            delete qnr.questions;
+            qnr.owner = 'user';
         }
 
-        return info;
+        const publicQuestionnaires = await con.all(`
+        SELECT id, name, visibility FROM Questionnaires 
+        JOIN UsersQuestionnaires ON Questionnaires.id = UsersQuestionnaires.questionnaire_id 
+        WHERE UsersQuestionnaires.user_id != ? AND visibility = 1`, userId);
+
+        for (const qnr of publicQuestionnaires) {
+            // Convert binary value to boolean
+            qnr.visibility = qnr.visibility === 1;
+
+            qnr.owner = 'public';
+        }
+
+        return [...userQuestionnaires, ...publicQuestionnaires];
     } catch (e) {
         return {code: 400, error: e};
     }
@@ -55,11 +60,14 @@ async function getQuestionnaireInfo(userId) {
 async function getQuestionnaire(id) {
     try {
         const con = await db.dbConn;
-        const qnr = await con.get(`SELECT name, questions FROM Questionnaires WHERE id = ?`, id);
+        const qnr = await con.get(`SELECT name, questions, visibility FROM Questionnaires WHERE id = ?`, id);
 
         if (qnr == null) {
             return {valid: false, code: 404, error: `Could not find questionnaire with id '${id}'`};
         }
+
+        // Convert binary value to boolean
+        qnr.visibility = qnr.visibility === 1;
 
         qnr.questions = JSON.parse(qnr.questions);
 
@@ -70,24 +78,37 @@ async function getQuestionnaire(id) {
 }
 
 async function checkUserAccess(qnrId, userId, edit = false) {
-    const info = await getQuestionnaireInfo(userId);
-    let ret;
-    for (const i of info) {
-        if (i.id === qnrId) {
-            ret = i;
-            break;
-        }
-    }
+    try {
+        const con = await db.dbConn;
+        const publicId = '_______________PUBLIC';
 
-    if (edit && ret != null) {
-        if (ret.owner === "public") {
-            return {valid: false, reason: "Public questionnaires cannot be edited once published.", code: 401};
-        }
-    } else if (ret == null) {
-        return {valid: false, reason: `Could not find questionnaire for user ${userId} with id ${qnrId}`, code: 404};
-    }
+        const qnr = await con.get(`SELECT name, visibility, user_id FROM Questionnaires
+                                   JOIN UsersQuestionnaires ON Questionnaires.id = UsersQuestionnaires.questionnaire_id 
+                                   WHERE Questionnaires.id = ?`, qnrId);
 
-    return {valid: true};
+        if (qnr == null) {
+            return {valid: false, reason: `Could not find questionnaire with ID ${qnrId} for user ID ${userId}.`, code: 404};
+        }
+
+        // Convert binary value to boolean
+        qnr.visibility = qnr.visibility === 1;
+
+        if (edit) {
+            if (qnr.user_id === publicId) {
+                return {valid: false, reason: 'Public questionnaires cannot be edited once published.', code: 401};
+            } else if (qnr.user_id !== userId) {
+                return {valid: false, reason: 'User does not have access to this questionnaire.', code: 401};
+            }
+        } else {
+            if (qnr.user_id !== publicId && qnr.user_id !== userId) {
+                return {valid: false, reason: 'User does not have access to this questionnaire.', code: 401};
+            }
+        }
+
+        return {valid: true};
+    } catch (e) {
+        return {valid: false, reason: e, code: 400};
+    }
 }
 
 async function deleteQuestionnaire(qnrId, userId) {
@@ -114,7 +135,7 @@ async function deleteQuestionnaire(qnrId, userId) {
     }
 }
 
-async function addQuestionnaire(name, questions, id, userId) {
+async function addQuestionnaire(name, questions, visibility, id, userId) {
     // if required parameter value is not defined, return HTTP bad request error code
     if (name === undefined) {
         return {
@@ -144,7 +165,7 @@ async function addQuestionnaire(name, questions, id, userId) {
     // if optional parameter values are not defined, generate default values instead
     const qnrId = id == null ? uuid() : id;
 
-    const qnr = {name: name, questions: questions};
+    const qnr = {name: name, questions: questions, visibility: visibility};
 
     for (const question of qnr.questions) {
         if (question.id == null) {
@@ -160,7 +181,7 @@ async function addQuestionnaire(name, questions, id, userId) {
     // add questionnaire to storage
     try {
         const con = await db.dbConn;
-        con.run('INSERT INTO Questionnaires (id, name, questions) VALUES (?, ?, ?)', qnrId, name, JSON.stringify(questions));
+        con.run('INSERT INTO Questionnaires (id, name, visibility, questions) VALUES (?, ?, ?, ?)', qnrId, name, visibility, JSON.stringify(questions));
 
         // assign to correct user
         if (userId == null) {
@@ -181,10 +202,11 @@ async function addQuestionnaire(name, questions, id, userId) {
     return {valid: true, id: qnrId, code: 200};
 }
 
-async function updateQuestionnaire(name, questions, qnrId, userId) {
+async function updateQuestionnaire(name, questions, visibility, qnrId, userId) {
     const qnr = {
         name,
-        questions
+        questions,
+        visibility
     };
 
     if (questions.length === 0) {
@@ -221,7 +243,7 @@ async function updateQuestionnaire(name, questions, qnrId, userId) {
 
         // update questionnaire
         const con = await db.dbConn;
-        con.run('UPDATE Questionnaires SET name = ?, questions = ? WHERE id = ?', name, JSON.stringify(qnr.questions), qnrId);
+        con.run('UPDATE Questionnaires SET name = ?, questions = ?, visibility = ? WHERE id = ?', name, JSON.stringify(qnr.questions), visibility, qnrId);
         return {valid: true, code: 200};
     } catch (e) {
         return {valid: false, code: 400, reason: e};

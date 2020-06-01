@@ -30,7 +30,8 @@ async function getResponses() {
     if (response.ok) {
         return await response.json();
     } else {
-        console.error(await response.text());
+        UIUtil.clearError();
+        UIUtil.showError(await response.text());
         return undefined;
     }
 }
@@ -82,8 +83,6 @@ async function displayResponses(qnr) {
     // Fetch responses
     const responses = await getResponses();
     if (responses == null) {
-        UIUtil.clearError();
-        UIUtil.showError("Could not get responses.");
         return;
     }
 
@@ -236,9 +235,9 @@ async function reload() {
         pageElements.signOut.classList.add("hidden");
     }
 
-    if (!await checkAuth()) {
-        return;
-    }
+    // if (!await checkAuth()) {
+    //     return;
+    // }
 
     const qnr = await getQuestionnaire();
 

@@ -13,6 +13,8 @@ function getFormData(id = URLUtil.getQuestionnaireId()) {
         questions: []
     };
 
+    data.visibility = pageElements.visiblity.value === 'public';
+
     const fieldsets = document.querySelectorAll("fieldset");
     for (const fieldset of fieldsets) {
         const question = {};
@@ -238,7 +240,8 @@ function displayQuestion(question = {text: "", type: "text"}) {
 async function displayQuestionnaire(questionnaire, options) {
     // if no questionnaire was found, error
     if (questionnaire == null) {
-        UIUtil.showError("Failed to load questionnaire");
+        UIUtil.clearError();
+        UIUtil.showError("Failed to load questionnaire.");
         return;
     }
 
@@ -246,6 +249,13 @@ async function displayQuestionnaire(questionnaire, options) {
     UIUtil.clearError();
 
     pageElements.title.value = questionnaire.name;
+
+    if (questionnaire.visibility === true) {
+        pageElements.visiblity.value = 'public';
+    } else {
+        pageElements.visiblity.value = 'private';
+    }
+
     UIUtil.removeChildren(pageElements.questions);
     for (const question of questionnaire.questions) {
         displayQuestion(question);
@@ -301,6 +311,7 @@ function getHandles() {
     pageElements.save = document.querySelector("#update");
     pageElements.signOut = document.querySelector(".signOut");
     pageElements.share = document.querySelector("#share");
+    pageElements.visiblity = document.querySelector("#visibility");
 }
 
 async function initAutosave() {

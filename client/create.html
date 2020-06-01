@@ -27,6 +27,13 @@
             <h2>Edit Questionnaire</h2>
             <label for="questionnaire-name">Questionnaire Title:</label>
             <input id="questionnaire-name" type="text"/>
+            <label>
+                Visibility:
+                <select id="visibility">
+                    <option value="public">Visible to anyone</option>
+                    <option value="private">Visible to anyone with the link</option>
+                </select>
+            </label>
             <button id="btn-delete-questionnaire">Delete questionnaire</button>
             <a href="" id="responses-link"><button>View Responses</button></a>
             <p id="error" class="error"></p>

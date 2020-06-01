@@ -148,9 +148,9 @@ async function addQuestionnaire(req, res) {
             res.status(tokenAuth.code).send(tokenAuth.reason);
             return;
         }
-        response = await qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id, tokenAuth.id);
+        response = await qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.visibility, req.body.id, tokenAuth.id);
     } else {
-        response = await qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.id);
+        response = await qnr.addQuestionnaire(req.body.name, req.body.questions, req.body.visibility, req.body.id);
     }
 
     if (!response.valid) {
@@ -171,9 +171,9 @@ async function updateQuestionnaire(req, res) {
             return;
         }
 
-        response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id, tokenAuth.id);
+        response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.body.visibility, req.params.id, tokenAuth.id);
     } else {
-        response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.params.id);
+        response = await qnr.updateQuestionnaire(req.body.name, req.body.questions, req.body.visibility, req.params.id);
     }
 
     if (!response.valid) {

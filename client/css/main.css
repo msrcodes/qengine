@@ -124,11 +124,16 @@ fieldset {
         display: grid;
         grid-template-rows: auto auto;
         grid-template-columns: 1fr 1fr;
-        grid-template-areas: "header header" "in out";
+        grid-template-areas: "header header" "a a";
     }
 
     header > a:not(.signOut) {
         grid-area: header;
+        justify-self: center;
+    }
+
+    #questionnaire-name {
+        grid-area: a;
         justify-self: center;
     }
 }

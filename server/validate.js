@@ -101,10 +101,18 @@ function validateQuestion(question) {
 }
 
 function validateQuestionnaire(qnr) {
-    if (qnr.name === undefined || qnr.questions === undefined) {
+    if (qnr.name === undefined || qnr.questions === undefined || qnr.visibility === undefined) {
         return {
             valid: false,
-            reason: `Missing required parameter. name: '${qnr.name}', questions: '${qnr.questions}'`,
+            reason: `Missing required parameter. name: '${qnr.name}', questions: '${qnr.questions}', visibility: '${qnr.visibility}'`,
+            code: 400
+        };
+    }
+
+    if (qnr.visibility !== true && qnr.visibility !== false) {
+        return {
+            valid: false,
+            reason: `Visibility must be a boolean value. Found '${qnr.visibility}'`,
             code: 400
         };
     }

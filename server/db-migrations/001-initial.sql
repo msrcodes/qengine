@@ -3,6 +3,7 @@
 CREATE TABLE Questionnaires (
   id CHAR(36) PRIMARY KEY,
   name TEXT NOT NULL,
+  visibility BOOLEAN NOT NULL,
   questions TEXT NOT NULL
 );
 

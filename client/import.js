@@ -20,6 +20,10 @@ async function createFromJSON() {
     pageElements.importError.textContent = "";
     pageElements.jsonInput.style.borderColor = "";
 
+    if (json.visibility == null) {
+        json.visibility = true;
+    }
+
     let res;
     if (AuthUtil.isUserSignedIn()) {
         json.token = AuthUtil.getAuthToken();

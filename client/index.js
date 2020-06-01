@@ -30,6 +30,12 @@ function populateTemplate(obj) {
     clone.querySelector(".responses").href = URLUtil.getURL("responses", obj.id);
 
     if (obj.owner === "user") {
+        if (obj.visibility === true) {
+            clone.querySelector("em").textContent = "Anyone can view this questionnaire.";
+        } else {
+            clone.querySelector("em").textContent = "Anyone with the link can view this questionnaire.";
+        }
+
         pageElements.questionnaireContainer.append(clone);
     } else if (obj.owner === "public") {
         clone.querySelector(".edit").remove();
