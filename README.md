@@ -84,5 +84,5 @@ To implement a new question type:
 - Add support for GUI editing in `client/lib/editor.js`. This requires the necessary element(s) being added to `client/create.html` and `client/edit.html` with retrieval in `editor.js getFormData()`.
 - OPTIONAL - Add CSS in `client/css/main.css` if necessary.
 
-### Want test data?
-Either use the examples in `json.html` or run `npm run data`.
+### Want extra test data?
+Use the examples in `json.html` (although any questionnaire by the specification provided should work).
