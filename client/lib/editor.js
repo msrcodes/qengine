@@ -385,6 +385,7 @@ function initInterface(options) {
     if (options.mode === 'create') {
         UIUtil.hide(pageElements.share);
         UIUtil.hide(pageElements.delete);
+        UIUtil.hide(pageElements.responsesLink);
     }
 }
 
