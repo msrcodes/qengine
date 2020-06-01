@@ -1,36 +1,11 @@
 {
   "name": "qengine",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A questionnaire engine built using NodeJS for second year Web Programming coursework",
   "main": "app.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node app.js",
-    "dev": "cross-env NODE_ENV=development node app.js",
-    "test": "jest"
+    "start": "node app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mikaelsrozee/qengine.git"
-  },
-  "keywords": [
-    "questionnaire",
-    "question",
-    "survey",
-    "engine",
-    "node",
-    "web",
-    "programming",
-    "database",
-    "surveying",
-    "data",
-    "elicitation"
-  ],
-  "author": "Mikael Rozee <mikaelsrozee@gmail.com> (https://msr.codes)",
-  "license": "LGPL-2.1",
-  "bugs": {
-    "url": "https://github.com/mikaelsrozee/qengine/issues"
-  },
-  "homepage": "https://github.com/mikaelsrozee/qengine#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "cross-env": "^7.0.2",
@@ -38,9 +13,5 @@
     "google-auth-library": "^6.0.0",
     "sqlite": "^3.0.3",
     "uuid-random": "^1.3.0"
-  },
-  "devDependencies": {
-    "node-fetch": "latest",
-    "jest": "^25.1.0"
   }
 }
