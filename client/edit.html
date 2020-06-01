@@ -33,7 +33,6 @@
                 <option value="private">Visible to anyone with the link</option>
             </select>
         </label>
-        <button id="btn-delete-questionnaire">Delete questionnaire</button>
         <a href="" id="responses-link"><button>View Responses</button></a>
         <p id="error" class="error"></p>
         <div id="questions">
@@ -41,6 +40,14 @@
         </div>
         <button id="add-question">Add question</button>
         <button id="update">Publish Questionnaire</button>
+    </section>
+    <section>
+        <h3>Delete this questionnaire</h3>
+        <label for="check-delete" class="required">
+            By ticking the following box and pressing the delete button, you understand that your questionnaire and all associated responses will be removed and cannot be recovered.
+        </label>
+        <input type="checkbox" id="check-delete">
+        <button id="btn-delete-questionnaire">Delete questionnaire</button>
     </section>
     <section id="share">
         <h3>Share this questionnaire</h3>

@@ -118,6 +118,11 @@ async function publishQuestionnaire(options) {
 }
 
 async function deleteQuestionnaire() {
+    if (!pageElements.checkDelete.checked) {
+        pageElements.checkDeleteLabel.classList.add("error");
+        return;
+    }
+
     let responseStr;
     if (AuthUtil.isUserSignedIn()) {
         responseStr = `questionnaires/${URLUtil.getQuestionnaireId()}/${AuthUtil.getAuthToken()}`;
@@ -299,6 +304,8 @@ function getHandles() {
     pageElements.addQuestion = document.querySelector("#add-question");
     pageElements.autosaveRestore = document.querySelector("#autosave-now");
     pageElements.autosaveTimer = document.querySelector("#autosave-time");
+    pageElements.checkDelete = document.querySelector("#check-delete");
+    pageElements.checkDeleteLabel = document.querySelector("label[for='check-delete']");
     pageElements.copy = document.querySelector("#copy-respond-btn");
     pageElements.delete = document.querySelector("#btn-delete-questionnaire");
     pageElements.error = document.querySelector("#error");
