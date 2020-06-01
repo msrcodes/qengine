@@ -84,5 +84,10 @@ To implement a new question type:
 - Add support for GUI editing in `client/lib/editor.js`. This requires the necessary element(s) being added to `client/create.html` and `client/edit.html` with retrieval in `editor.js getFormData()`.
 - OPTIONAL - Add CSS in `client/css/main.css` if necessary.
 
+### Storing JSON in a database
+I had the choice to either break down question arrays and responses into database fields and rebuild them each time, or use `JSON.stringify` to store them as text and `JSON.parse` to take that text and turn it back into an object.
+
+The benefits of the former weren't there for me, so I opted for the simpler solution. Implementing the former would overcomplicate the system in an area that doesn't need to be overcomplicated, increasing maintainability.
+
 ### Want extra test data?
 Use the examples in `json.html` (although any questionnaire by the specification provided should work).
