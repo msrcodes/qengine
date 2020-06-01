@@ -165,6 +165,7 @@ async function addQuestionnaire(name, questions, visibility, id, userId) {
 
     // if optional parameter values are not defined, generate default values instead
     const qnrId = id == null ? uuid() : id;
+    visibility = visibility == null ? true : visibility;
 
     const qnr = {name: name, questions: questions, visibility: visibility};
 

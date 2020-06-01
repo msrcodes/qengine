@@ -36,21 +36,89 @@ async function getResponses() {
     }
 }
 
-async function exportToFile(format) {
-    const responses = await getResponses();
-    const timestamp = Date.now();
-    if (format === "json") {
-        const a = document.createElement("a");
-        a.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(responses)));
-        a.setAttribute("download", `export-${timestamp}.json`);
+function formatCSVString(string) {
+    // If text contains a comma, the entire string must be wrapped in double quotes.
+    if (string.includes(",")) {
+        // If double quotes are used to wrap a field...
+        let i = 0;
+        let ret = '';
+        for (const char of string) {
+            // any double quote inside the string must be escaped by an additional double quote
+            if (char === '"') {
+                ret = ret + '"';
+            }
 
-        a.style.display = "none";
-        document.body.appendChild(a);
+            ret = ret + char;
+            i++;
+        }
 
-        a.click();
-
-        document.body.removeChild(a);
+        string = `"${ret}"`;
     }
+    return string;
+}
+
+async function exportToFile(format) {
+    const questionnaire = await getQuestionnaire();
+    const responses = await getResponses();
+
+    let content;
+    if (format === "json") {
+        const obj = [];
+        for (const response of responses) {
+            const ret = {};
+            for (const key of Object.keys(response)) {
+                let flag = false;
+                for (const question of questionnaire.questions) {
+                    if (question.id === key) {
+                        ret[question.text] = response[key];
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag) {
+                    ret[key] = response[key];
+                }
+            }
+            obj.push(ret);
+        }
+
+        content = JSON.stringify(obj);
+    } else if (format === "csv") {
+        const ids = [];
+        const titles = [];
+        for (const question of questionnaire.questions) {
+            ids.push(question.id);
+
+            question.text = formatCSVString(question.text);
+
+            titles.push(question.text);
+        }
+
+        content = `${titles}`;
+
+        for (const response of responses) {
+            const line = [];
+            for (const id of ids) {
+                let res = String(response[id]);
+
+                res = formatCSVString(res);
+
+                line.push(res);
+            }
+            content = content + `\n${line}`;
+        }
+    }
+
+    const a = document.createElement("a");
+    a.setAttribute("href", `data:text/${format};charset=utf-8,` + encodeURIComponent(content));
+    a.setAttribute("download", `export-${Date.now()}.${format}`);
+
+    a.style.display = "none";
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
 }
 
 function addGraph(question) {
@@ -166,10 +234,12 @@ async function displayResponses(qnr) {
 }
 
 function addEventListeners() {
+    pageElements.exportCSV.addEventListener('click', async () => await exportToFile("csv"));
     pageElements.exportJSON.addEventListener('click', async () => await exportToFile("json"));
 }
 
 function getHandles() {
+    pageElements.exportCSV = document.querySelector("#export-csv");
     pageElements.exportJSON = document.querySelector("#export-json");
     pageElements.name = document.querySelector("#questionnaire-name");
     pageElements.responsesContainer = document.querySelector("#responses-container");
