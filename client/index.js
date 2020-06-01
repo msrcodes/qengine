@@ -99,4 +99,12 @@ async function onPageLoad() {
 }
 
 // Load page once auth has loaded, prevents race conditions.
-gapi.load('auth2', onPageLoad);
+function waitForAuth() {
+    try {
+        gapi.load('auth2', onPageLoad);
+    } catch (e) {
+        setTimeout(waitForAuth, 1000);
+    }
+}
+
+waitForAuth();
